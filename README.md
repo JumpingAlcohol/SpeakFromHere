@@ -8,6 +8,8 @@ This is the MVP. It deliberately reads only selected text; later versions can us
 
 Documentation and download instructions are available in English and Simplified Chinese. Runtime status messages currently use English; an in-app language selector is not implemented yet.
 
+[Download v0.1.0 preview](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.1.0) · [Version plan](docs/ROADMAP.md)
+
 ## Playback controls
 
 | Shortcut | Action |

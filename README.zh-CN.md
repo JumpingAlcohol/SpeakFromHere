@@ -8,6 +8,8 @@
 
 项目文档和下载包说明均提供英文、简体中文两版。目前程序的状态提示使用英文，尚未实现程序内的语言切换。
 
+[下载 v0.1.0 预览版](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.1.0) · [版本计划](docs/ROADMAP.zh-CN.md)
+
 ## 播放控制
 
 | 快捷键 | 功能 |
