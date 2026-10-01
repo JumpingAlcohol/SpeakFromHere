@@ -1,8 +1,12 @@
 # AI Chat Reader
 
-Your first Windows project: select text anywhere, then press **Alt + S** to have Windows read it aloud.
+[English](README.md) | [简体中文](README.zh-CN.md)
+
+A lightweight Windows reader for selected text, designed for listening to long AI chat replies. Select text and press **Alt + S** to read it aloud.
 
 This is the MVP. It deliberately reads only selected text; later versions can use Windows UI Automation to recognize one Codex or ChatGPT reply and start at the paragraph under the cursor.
+
+Documentation and download instructions are available in English and Simplified Chinese. Runtime status messages currently use English; an in-app language selector is not implemented yet.
 
 ## Playback controls
 
@@ -25,6 +29,14 @@ When paused, reading a new selection starts the new text immediately. Stopping c
 If copying fails, it reports `No new text copied...` instead of reading old clipboard contents. The copy replaces your clipboard contents, just like copying normally.
 
 ## Run it
+
+### Portable Windows executable
+
+If you have a built `AIChatReader.exe`, double-click it. Python and dependencies are included. Keep its status window open or minimized and use the shortcuts above. Close any reader already running in a Python terminal before starting the executable.
+
+The portable ZIP includes `AIChatReader.exe`, `QuickStart.en.txt` and `QuickStart.zh-CN.txt`. Extract it before running. The binary is produced locally in `outputs/`; generated binaries are not checked into Git.
+
+### Run from source
 
 Requires Windows 10/11 and Python 3.11 or later. Speech uses a locally installed Windows SAPI voice; no API key or online speech service is required.
 
@@ -77,6 +89,27 @@ Remove-Item Env:\CHAT_READER_WINDOWS_TESTS
 ```
 
 The integration tests use temporary audio files or mute only the test voice. They do not play audible speech or change system volume.
+
+## Build the Windows executable
+
+On Windows, after creating the virtual environment:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[build]"
+.\scripts\build.ps1
+```
+
+The outputs are `outputs/AIChatReader.exe` and `outputs/AIChatReader-Windows-x64.zip`. The ZIP includes the executable and both quick-start guides, copied from `docs/`. The build configuration bundles a single executable with a console status window, local Windows speech support, and global keyboard shortcuts. Temporary build files stay in `work/`.
+
+The build uses [PyInstaller's single-file packaging](https://pyinstaller.org/en/stable/usage.html).
+
+To check the built executable in isolation, close any running reader and run:
+
+```powershell
+.\scripts\test-executable.ps1
+```
+
+This copies only the executable into a fresh test directory, starts it twice with hidden windows, checks idle pause, stop and graceful exit through its Windows message queue, and confirms hotkeys can be registered again after exit. It does not replace the manual selected-text-and-audio check.
 
 ## Paragraph-to-reply reading: current status
 

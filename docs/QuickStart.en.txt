@@ -1,0 +1,23 @@
+AI Chat Reader — Windows portable edition
+
+English: QuickStart.en.txt | 简体中文: QuickStart.zh-CN.txt
+
+Extract the ZIP before running. Close any reader already running in VS Code or another terminal to avoid hotkey conflicts.
+Double-click AIChatReader.exe. Python and dependencies are included; no separate installation is needed.
+Keep the status window open or minimized. Runtime status messages currently use English.
+
+Alt + S: Read selected text. Release both keys after pressing the shortcut.
+Alt + P: Pause; press again to resume from the same position.
+Alt + X: Stop speech while keeping the reader running.
+Alt + Shift + Q: Exit the reader.
+Ctrl + C: Exit from the reader's status window.
+
+First check: select a passage in your chat, press Alt + S, and confirm the Reading preview in the status window is correct.
+While reading, try pause, resume and stop, then select a different passage and start reading again.
+Reading a new selection while paused starts the new text immediately. Stopping clears the reading position.
+
+The preview shows only the first 100 characters. The full text is read aloud.
+Simulated copying replaces the clipboard contents. The target app must support Ctrl + C for its selection.
+Speech uses a locally installed Windows voice; no API key or online speech service is required.
+The current version reads selected text. It does not yet recognize entire replies or the paragraph under the mouse.
+Windows 10/11, x64. Run only one reader instance at a time.

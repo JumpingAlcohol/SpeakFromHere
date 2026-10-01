@@ -13,6 +13,9 @@ dependencies = [
     "pywin32>=312,<313; sys_platform == 'win32'",
 ]
 
+[project.optional-dependencies]
+build = ["pyinstaller==6.22.3; sys_platform == 'win32'"]
+
 [tool.unittest]
 start-directory = "tests"
 
