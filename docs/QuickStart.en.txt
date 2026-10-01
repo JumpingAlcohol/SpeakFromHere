@@ -1,4 +1,4 @@
-AI Chat Reader — Windows portable edition
+AI Chat Reader v0.2.0 — Windows portable preview
 
 English: QuickStart.en.txt | 简体中文: QuickStart.zh-CN.txt
 
@@ -7,6 +7,7 @@ Double-click AIChatReader.exe. Python and dependencies are included; no separate
 Keep the status window open or minimized. Runtime status messages currently use English.
 
 Alt + S: Read selected text. Release both keys after pressing the shortcut.
+Alt + E: Point at ordinary text in a completed AI reply and read from that paragraph to the reply's end. No selection needed.
 Alt + P: Pause; press again to resume from the same position.
 Alt + X: Stop speech while keeping the reader running.
 Alt + Shift + Q: Exit the reader.
@@ -19,5 +20,11 @@ Reading a new selection while paused starts the new text immediately. Stopping c
 The preview shows only the first 100 characters. The full text is read aloud.
 Simulated copying replaces the clipboard contents. The target app must support Ctrl + C for its selection.
 Speech uses a locally installed Windows voice; no API key or online speech service is required.
-The current version reads selected text. It does not yet recognize entire replies or the paragraph under the mouse.
+Paragraph reading is limited to the inspected Codex desktop build 26.928.3736.0 (OpenAI.Codex package).
+It handles ordinary AI reply text, headings and recognized lists, and skips code blocks.
+Tables, editable writing blocks, your own messages and other apps are not supported by Alt + E; use Alt + S instead.
+App updates and incomplete/unknown layouts report a reason, rather than guessing reply boundaries.
+Paragraph capture does not copy, click or upload text. Pause, stop and exit cancel a pending capture.
+Source and portable modes passed the user's paragraph/audio check on the development Windows 11 x64 machine.
+Compatibility with other computers and app builds is not yet established.
 Windows 10/11, x64. Run only one reader instance at a time.

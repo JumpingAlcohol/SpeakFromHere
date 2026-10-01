@@ -43,7 +43,7 @@ def capture_selection(desktop, *, clock=time.monotonic, sleep=time.sleep):
     return ""
 
 
-def run_reader_loop(desktop, speaker, *, report=print,
+def run_reader_loop(desktop, speaker, *, report=print, paragraph_reader=None,
                     clock=time.monotonic, sleep=time.sleep):
     """Keep capture and speech on the main thread and always clean up on exit."""
     try:
@@ -51,13 +51,23 @@ def run_reader_loop(desktop, speaker, *, report=print,
         report("AI Chat Reader is running. Select text, press Alt + S, then release both keys.")
         report("Playback: Alt + P to pause/resume, Alt + X to stop speech.")
         report("Exit: Ctrl + C in this terminal, or Alt + Shift + Q anywhere.")
+        if paragraph_reader is not None:
+            report("Experimental paragraphs: point at ordinary completed reply text and press Alt + E.")
         while True:
             event = desktop.next_hotkey()
             if event == "quit":
                 break
-            if event in {"read", "pause", "stop"}:
+            if event in {"read", "pause", "stop", "paragraph"}:
                 try:
-                    if event == "pause":
+                    if paragraph_reader is not None:
+                        paragraph_reader.cancel()
+                    if event == "paragraph":
+                        if paragraph_reader is None:
+                            report("Paragraph reading is not enabled. Use Alt + S.")
+                        else:
+                            paragraph_reader.start(desktop.pointer_position())
+                            report("Checking paragraph... Playback controls remain available.")
+                    elif event == "pause":
                         state = speaker.toggle_pause()
                         report({
                             "paused": "Speech paused. Alt + P to resume.",
@@ -65,25 +75,44 @@ def run_reader_loop(desktop, speaker, *, report=print,
                             "idle": "Nothing is currently being read. Select text and press Alt + S.",
                         }[state])
                         continue
-                    if event == "stop":
+                    elif event == "stop":
                         speaker.stop()
                         report("Speech stopped. Select text and press Alt + S to read again.")
                         continue
-                    text = capture_selection(desktop, clock=clock, sleep=sleep)
-                    if not text:
-                        report("No new text copied. Select text in the active app and try again.")
-                        continue
-                    preview = " ".join(text.split())[:100]
-                    report(f"Reading: {preview}")
-                    speaker.speak(text)
+                    else:
+                        text = capture_selection(desktop, clock=clock, sleep=sleep)
+                        if not text:
+                            report("No new text copied. Select text in the active app and try again.")
+                            continue
+                        preview = " ".join(text.split())[:100]
+                        report(f"Reading: {preview}")
+                        speaker.speak(text)
                 except Exception as error:
-                    report(f"Could not {'read this selection' if event == 'read' else 'control playback'}: {error}")
+                    action = {"read": "read this selection", "paragraph": "read this paragraph"}.get(event, "control playback")
+                    report(f"Could not {action}: {error}")
+            if paragraph_reader is not None:
+                try:
+                    result = paragraph_reader.poll()
+                    if result is not None:
+                        text, error = result
+                        if error:
+                            report(f"Could not read this paragraph: {error}")
+                        else:
+                            preview = " ".join(text.split())[:100]
+                            report(f"Reading paragraph: {preview}")
+                            speaker.speak(text)
+                except Exception as error:
+                    report(f"Could not read this paragraph: {error}")
             sleep(0.01)
     except KeyboardInterrupt:
         pass
     finally:
         try:
-            speaker.stop()
+            if paragraph_reader is not None:
+                paragraph_reader.close()
         finally:
-            desktop.close()
+            try:
+                speaker.stop()
+            finally:
+                desktop.close()
         report("AI Chat Reader stopped.")

@@ -1,6 +1,7 @@
+param([string]$ExecutablePath = 'outputs\v0.2.0\AIChatReader.exe')
 $ErrorActionPreference = 'Stop'
 $projectDirectory = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$sourceExecutable = Join-Path $projectDirectory 'outputs\AIChatReader.exe'
+$sourceExecutable = Join-Path $projectDirectory $ExecutablePath
 if (-not (Test-Path -LiteralPath $sourceExecutable)) { throw 'Build the executable first.' }
 $testDirectory = Join-Path $projectDirectory ('work\exe-smoke-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $testDirectory -Force | Out-Null
@@ -44,6 +45,7 @@ for ($attempt = 1; $attempt -le 2; $attempt++) {
         -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
     try {
         Wait-ReaderOutput $stdout 'AI Chat Reader is running.' $testProcess
+        Wait-ReaderOutput $stdout 'Experimental paragraphs:' $testProcess
         # A one-file bundle starts a child process after unpacking its runtime.
         $children = @(Get-CimInstance Win32_Process -Filter "ParentProcessId = $($testProcess.Id)" |
             Where-Object { $_.ExecutablePath -eq $testExecutable })

@@ -22,18 +22,18 @@ The initial target is the user's Codex/ChatGPT desktop workflow. Support for add
 
 The sequence expresses priorities, not guaranteed completion dates. A version can be split if its acceptance criteria are not yet met; unfinished work must not be presented as released functionality.
 
-## v0.2.0 feasibility gate
+## v0.2.0 acceptance checkpoint
 
-This is the next functional priority. The first desktop accessibility inspection returned window containers but no chat text or message boundaries. That observation is not proof that all possible text-access methods are unavailable, but it means reliable paragraph reading cannot be promised yet.
+Source and portable acceptance passed on 2026-10-01: the user confirmed paragraph starts, same-reply endings, switching starts/replies and playback controls in the actual target app, followed by the packaged executable. The portable preview also passed startup/control/exit and bundled-worker checks. Only desktop package `OpenAI.Codex_26.928.3736.0_x64__2p2nqsd0c76g0` is accepted. Editable writing blocks, tables, user messages, other apps and unknown layouts are outside paragraph-reading scope. Keep v0.1.0 as the selected-text-only fallback.
 
-Before enabling the shortcut:
+Acceptance areas checked for this preview:
 
 1. Check whether Windows accessibility interfaces provide reply text, paragraph order and reliable reply ownership in the target app.
 2. Verify mouse-point-to-paragraph mapping, including repeated paragraph text, links/lists, wrapped lines and off-screen parts of the same reply.
 3. Build and test the bounded extraction rule: current paragraph through the end of the same assistant reply.
 4. Integrate extraction with existing playback controls, then verify it against the actual app and state which app/version was tested.
 
-The default paragraph-reading plan skips code blocks; selected-text reading continues to read exactly what the user selects. The beginning of a list item counts as a paragraph boundary. These are planned behaviours, not capabilities of v0.1.0.
+The preview skips code blocks and treats a list item as a starting block; selected-text reading continues to read exactly what the user selects. These are not capabilities of the v0.1.0 download. Next milestone: v0.2.1 reading settings, after publication and feedback. Do not quietly expand the verified app/build scope.
 
 If the app does not expose enough structure, record the limitation and keep v0.1.0 working. A local reading panel into which the user explicitly copies one complete reply is a possible fallback, but it must be presented as a separate workflow; it is not the same as reading directly from a paragraph in Codex/ChatGPT. Do not silently change the product into a browser extension or claim desktop support without evidence.
 

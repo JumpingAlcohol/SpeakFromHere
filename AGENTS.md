@@ -12,3 +12,10 @@
 
 - Do not commit virtual environments, caches, local credentials, scratch files or generated binaries. Build outputs belong in ignored `outputs/` and intermediate files in ignored `work/`.
 - Verify the portable ZIP contains the executable and both quick-start files after changing packaging or documentation.
+
+## Project continuity
+
+- Read `CONTEXT.md` at the start of a new chat before exploring the repository. It is a short handoff of verified milestones, boundaries, commands and the next priority.
+- Keep it concise and update it when a milestone or workflow changes. Do not copy old chat transcripts into it.
+- Treat recorded release/build results as historical evidence; verify Git state, artifacts and remote status before publishing again.
+- Never put credentials, captured private chat text or personal absolute paths into the public handoff.
