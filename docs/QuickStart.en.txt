@@ -1,11 +1,11 @@
-SpeakFromHere v0.3.0 — Floating-player candidate (tested reading workflows user-confirmed)
+SpeakFromHere v0.3.0 — Floating Player & Bounded Skipping Preview
 English: QuickStart.en.txt | 简体中文: QuickStart.zh-CN.txt
 
 Read AI responses aloud from exactly where you want.
 Reply-aware listening from a supported paragraph's beginning to the end of the
 same completed AI reply, not arbitrary word/sentence seeking.
 Formerly AI Chat Reader; original module/settings paths are retained.
-This is a local candidate, not a newly published download.
+This is a preview, not a stable or universally compatible release.
 
 START
 Exit other readers, extract the ZIP, double-click SpeakFromHere.exe.
@@ -38,7 +38,7 @@ No skipped text or file names in this memory-only list. It is NOT original-text
 highlighting or synchronized progress. New reads replace it; pause/replay preserve it.
 ⚙: Edit pause/stop/exit keys; restart to apply. Alt+S / Alt+E stay fixed.
 —: Hide to tray. Click the notification-area icon to restore.
-×: Exit and release shortcuts. No startup-at-login option in this candidate.
+×: Exit and release shortcuts. No startup-at-login option in this preview.
 
 SETTINGS AND PRIVACY
 %LOCALAPPDATA%\AIChatReader\settings.json (schema 2) stores only rate, control

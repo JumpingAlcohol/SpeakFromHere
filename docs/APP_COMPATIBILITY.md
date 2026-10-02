@@ -2,7 +2,7 @@
 
 ## English
 
-The local v0.3.0 candidate replaces the exact Codex version path gate with two independent requirements. Older published readers remain unchanged.
+The v0.3.0 preview replaces the exact Codex version path gate with two independent requirements. Older published readers remain unchanged.
 
 1. **Application identity:** from the captured document's PID, open one limited-query process handle and read its image path, package family and package full name. Resolve that exact package's registered install directory. Accept only `OpenAI.Codex_2p2nqsd0c76g0` and the image at that directory's `app/ChatGPT.exe`. Unpackaged apps, lookalike names/folders, other families and failed identity queries do not fall back to path guessing. This trusts Windows-reported package membership; it is not a separate signature audit or a guarantee against a compromised local OS.
 2. **Reply structure:** retain the existing complete Chrome capture, unique identities, hidden assistant marker, unambiguous supported paragraph, explicit reply completion, protected-text and same-reply ending checks. Current generating replies and unknown/unsafe structures still reject. No window flattening or automatic clipboard fallback.
@@ -15,7 +15,7 @@ Verification scope: real local package membership for `26.928.4866.0`; synthetic
 
 ## 简体中文
 
-本地 v0.3.0 候选版将精确 Codex 版本路径限制改为两个独立要求；旧的已发布朗读器不变。
+v0.3.0 预览版将精确 Codex 版本路径限制改为两个独立要求；旧的已发布朗读器不变。
 
 1. **应用身份：**从捕获文档的 PID 打开一个只查询身份的进程句柄，读取程序路径、包家族及完整包名，再取得该包注册的安装目录。只接受 `OpenAI.Codex_2p2nqsd0c76g0` 以及该目录中的 `app/ChatGPT.exe`。没有包身份、名称／目录仿冒、其他包家族或身份查询失败时，不退回路径猜测。这信任 Windows 返回的包归属，不是额外的数字签名审计，也不能保证已被入侵的本地系统可信。
 2. **回复结构：**保留 Chrome 检查完整性、唯一节点身份、隐藏 AI 标记、明确的支持段落起点、回复完成标记、受保护文字及同一回复末尾检查。当前正在生成的回复、未知或不安全结构仍拒读；不拼读整个窗口，不自动复制兜底。

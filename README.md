@@ -18,7 +18,7 @@ SpeakFromHere is a lightweight, reply-aware reader for **Windows desktop AI work
 
 These highlights describe a focused workflow combination, not “first,” “only” or “best.” [codex-read-aloud](https://github.com/cobibean/codex-read-aloud) documents macOS/latest-message reading; [Echo](https://chromewebstore.google.com/detail/echo-read-x-chatgpt-subst/acmcamiebaibkbafoancpkdapcijoine) documents browser reply controls and clickable transcripts; [2lazy2read](https://2lazy2read.com/) documents Windows selected-text listening. Features overlap. See the [source-backed comparison](docs/COMPETITIVE_POSITIONING.md) and [brand definition](docs/BRAND.md).
 
-This is an independent project, not an official OpenAI product. Delays, opening-audio loss and layout limitations are tracked in [known issues](docs/KNOWN_ISSUES.md). The local candidate now omits recognized nonreadable blocks with a visible notice; it does not blindly ignore every unknown structure.
+This is an independent project, not an official OpenAI product. Delays, opening-audio loss and layout limitations are tracked in [known issues](docs/KNOWN_ISSUES.md). The v0.3.0 preview omits recognized nonreadable blocks with a visible notice; it does not blindly ignore every unknown structure.
 
 ## Preview status
 
@@ -26,13 +26,13 @@ v0.2.0 adds paragraph-to-reply reading for the inspected desktop build. Both sou
 
 Documentation and download instructions are available in English and Simplified Chinese. The new floating player has a persisted English/Chinese selector; console output and detailed diagnostics remain English.
 
-The working tree targets the **v0.3.0 floating-player candidate**, building on v0.2.1 settings. Subsequent parser work adds bounded skipping and omission notices; playback-delay/opening-audio reports remain open. This is local, not a published download. `Alt + S` and `Alt + E` remain fixed; no other apps are enabled.
+**v0.3.0 — Floating Player & Bounded Skipping Preview** adds a terminal-free player, persisted bilingual settings and visible omission notices for recognized nonreadable blocks. Playback-delay/opening-audio reports remain open. `Alt + S` and `Alt + E` remain fixed; no other paragraph-reading apps are enabled.
 
-[Download v0.2.0 preview](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.2.0) · [Previous v0.1.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.1.0) · [Version plan](docs/ROADMAP.md)
+[Download v0.3.0 preview](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.3.0) · [Previous v0.2.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.2.0) · [Previous v0.1.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.1.0) · [Version plan](docs/ROADMAP.md)
 
-Formerly **AI Chat Reader**. The existing repository URL, Python distribution `ai-chat-reader`, module `chat_reader`, environment flags and `%LOCALAPPDATA%\AIChatReader\settings.json` are retained. Published v0.1.0/v0.2.0 downloads still use their original names and files. The current local GUI candidate is in `outputs/v0.3.0/SpeakFromHere/`; older candidates remain separate. No repository rename or new release has been published.
+Formerly **AI Chat Reader**. The existing repository URL, Python distribution `ai-chat-reader`, module `chat_reader`, environment flags and `%LOCALAPPDATA%\AIChatReader\settings.json` are retained. Historical v0.1.0/v0.2.0 downloads keep their original names and files. New portable builds use `outputs/v0.3.0/SpeakFromHere/`; the repository has not been renamed.
 
-## Floating player (v0.3.0 candidate)
+## Floating player (v0.3.0 preview)
 
 Extract the **entire ZIP**, keeping `reader-worker/` next to the two main executables, and double-click `SpeakFromHere.exe`: a compact, always-on-top player opens at the bottom right of the current monitor's work area, above the taskbar. No terminal is required. Drag its title to move it. Close any other reader first. Do not move only the exe: paragraph reading requires the helper folder.
 
@@ -45,7 +45,7 @@ Extract the **entire ZIP**, keeping `reader-worker/` next to the two main execut
 
 An amber **Skipped …** notice discloses omitted types/counts, including omissions before your starting paragraph. **Details** lists ordered reply-block numbers and whether each is before the start or in the remaining reply. No skipped text or file names enter the notice; it is memory-only. Pause/replay preserve it and a new read replaces it. Block numbers are not screen coordinates. This is not original-text highlighting or synchronized progress tracking.
 
-This candidate does not add login startup, new voices, sentence seeking or original-text highlighting. The user confirmed editable-block and edited-files skipping. A real table-widget refusal was traced to its grid/overlay container and standalone footer controls; narrow fixes have regression coverage, and the user reports ordinary/table reading works after updating Codex. See [candidate notes](docs/releases/v0.3.0.md).
+This preview does not add login startup, new voices, sentence seeking or original-text highlighting. The user confirmed editable-block and edited-files skipping. A real table-widget refusal was traced to its grid/overlay container and standalone footer controls; narrow fixes have regression coverage, and the user reports ordinary/table reading works after updating Codex. See [release notes](docs/releases/v0.3.0.md).
 
 ## Playback controls
 
@@ -194,19 +194,19 @@ Only `pause`, `stop` and `exit` bindings can change, using `Alt+LETTER` or `Alt+
 
 Source and portable versions share `%LOCALAPPDATA%\AIChatReader\settings.json`. Schema 2 adds `language` to rate and control bindings; no chat text or credentials are saved. Existing schema-1 files load unchanged and upgrade only on explicit save. **Back up settings before switching versions:** v0.2.1 does not understand schema 2 and falls back to defaults with a warning. Saves are atomic. Missing files use defaults without creating a file. Invalid/unreadable files are preserved with warning/default startup; direct updates are refused. After backing up, explicitly confirm GUI Reset or use `--reset-settings` to replace them. `--settings-file PATH` selects an isolated profile, without changing paragraph scope.
 
-Manual acceptance is pending: save rate 2 and pause `Alt+J`, restart, verify startup feedback and audible rate, use the new pause/resume key, repeat selection and first/middle/last paragraph reads, then stop/exit and restart. Unsupported content must still report “Use Alt + S” without copying/speaking automatically. Restore defaults with `--reset-settings` if desired.
+To check customized settings: save rate 2 and pause `Alt+J`, restart, verify startup feedback and audible rate, use the new pause/resume key, repeat selection and first/middle/last paragraph reads, then stop/exit and restart. Unsupported content must still report “Use Alt + S” without copying/speaking automatically. Restore defaults with `--reset-settings` if desired.
 
 Paragraph startup and collection now run off the control thread, with coordinates sampled when the command is handled. Pause/stop/new reads cancel even a pending process launch; late children are reaped and stale results are ignored. The 20-second deadline includes launch time. Exit releases controls first but process shutdown may wait briefly for a pending native launch to return so its child can be cleaned up. This does not establish a fix for SAPI or selected-text pause/start delays.
 
-Open user feedback: Alt+S playback can also start late, pauses are frequently delayed, and first playback may omit opening characters; causes are unconfirmed. The candidate now skips recognized nonreadable regions with an omission notice. Unknown/protected/boundary-ambiguous structures can still reject the reply. See [known issues and acceptance requirements](docs/KNOWN_ISSUES.md). Candidate manual acceptance remains open.
+Open user feedback: Alt+S playback can also start late, pauses are frequently delayed, and first playback may omit opening characters; causes are unconfirmed. The v0.3.0 preview skips recognized nonreadable regions with an omission notice. Unknown/protected/boundary-ambiguous structures can still reject the reply. See [known issues and acceptance requirements](docs/KNOWN_ISSUES.md). The user confirmed tested ordinary/table/editor/file workflows after a Codex update; separate audio reports and uninspected layouts remain open.
 
-The local v0.3.0 candidate now corrects a GUI/worker display-scaling coordinate mismatch that could target a different application and report an identity error. Cursor sampling, UIA point lookup and paragraph bounds use the same physical-pixel coordinate space without changing Windows scaling or relaxing identity checks. Native regression coverage includes the development machine's scaled desktop; real-chat manual retesting remains required. This does not resolve the playback or unsupported-block reports above.
+The v0.3.0 preview corrects a GUI/worker display-scaling coordinate mismatch that could target a different application and report an identity error. Cursor sampling, UIA point lookup and paragraph bounds use the same physical-pixel coordinate space without changing Windows scaling or relaxing identity checks. Native regression coverage includes the development machine's scaled desktop; the user confirmed GUI paragraph reading was restored. Playback reports and uninspected-layout limitations remain open.
 
 ## Paragraph-to-reply reading: current status
 
-On 2026-10-01, the user confirmed first/middle/last paragraph starts, same-reply ending, switching starts/replies and controls in source and portable modes. That historical preview rejected tables/editors. The new local candidate's omission rules below need separate acceptance. Broader app, machine and language compatibility has not been established.
+On 2026-10-01, the user confirmed first/middle/last paragraph starts, same-reply ending, switching starts/replies and controls in source and portable modes. That historical preview rejected tables/editors. On 2026-10-02, the user confirmed tested ordinary/table/editor/file workflows after a Codex update; the exact updated package version was not captured. Broader app, machine and language compatibility has not been established.
 
-The local package passed two isolated startup/control/exit runs, standalone bundled-UIA verification, and the full 88-test suite with Windows integration checks enabled. Both ZIP guides match their canonical sources and the archive checksum was verified. No captured private chats are included.
+The v0.3.0 package passed isolated startup/control/exit runs and bundled-UIA verification. All 190 tests passed with the Windows/GUI/UIA/portable opt-ins enabled; embedded GUI/console checks passed 90 each and helper checks passed 66. Both ZIP guides match their canonical sources and the archive checksum was verified. No captured private chats are included. These checks do not establish broader machine or audio compatibility.
 
 ### Run the paragraph preview from source
 
@@ -221,7 +221,7 @@ Keep the target window visible and point at ordinary text in a completed assista
 
 Scope and safeguards:
 
-- The current local v0.3.0 candidate verifies Windows-reported package family `OpenAI.Codex_2p2nqsd0c76g0` and that the captured process is the registered package's `app/ChatGPT.exe`. Numeric version alone no longer rejects an update; the inspected reply structure must still pass every capture, ownership, paragraph and completion check. Different apps, unpackaged/lookalike executables and changed/unsafe layouts remain unsupported. This is not universal Codex/ChatGPT/browser compatibility. Older downloads retain their original exact-version gate. See [application compatibility](docs/APP_COMPATIBILITY.md). Chinese interface structure has local captures; English markers have synthetic coverage only.
+- The v0.3.0 preview verifies Windows-reported package family `OpenAI.Codex_2p2nqsd0c76g0` and that the captured process is the registered package's `app/ChatGPT.exe`. Numeric version alone no longer rejects an update; the inspected reply structure must still pass every capture, ownership, paragraph and completion check. Different apps, unpackaged/lookalike executables and changed/unsafe layouts remain unsupported. This is not universal Codex/ChatGPT/browser compatibility. Older downloads retain their original exact-version gate. See [application compatibility](docs/APP_COMPATIBILITY.md). Chinese interface structure has local captures; English markers have synthetic coverage only.
 - Ordinary paragraphs, headings, inline text/links and recognized list items are handled. A list item is a starting block; code blocks and verified non-text leaf separators are skipped. Hovering code, separators, user messages, buttons or input fields is rejected.
 - Recognized Table (50036) blocks, the inspected `group/app-widget` table container with a typed grid and bounded action overlay, the known `group/writing-block-surface` editor wrapper, inspected collapsed edited-files summaries with contiguous rows, and simple post-Copy activity status containers are omitted without reading their contents. Code omissions are also disclosed. The tested editor/file skips are user-confirmed; ordinary/table reading is also user-confirmed after a Codex client update. Expanded/changed regions may still reject. Pointing at any skipped block does not advance to another paragraph; use `Alt + S` on a copyable selection.
 - Known standalone Regenerate/More footer buttons are ignored only as unprotected, correctly styled leaves after the same reply's verified Copy footer; they do not prove completion. Their Chinese labels were inspected locally; English counterparts have synthetic coverage only. Unknown buttons or hidden descendants still reject.
@@ -231,7 +231,7 @@ Scope and safeguards:
 - Capture uses physical screen coordinates and a separate process with a 20-second timeout. A new read replaces a pending capture; pause, stop and exit cancel it so a late result cannot restart speech. The existing voice continues while a new capture is pending, unless you stop or pause it.
 - Paragraph capture does not click, copy, save a chat file or upload text. Text is held locally in memory and read with Windows SAPI. Only the separate inspection command below saves a private diagnostic JSON. The terminal preview is limited to 100 characters; the extracted suffix is spoken in full.
 
-Source mode without `--paragraphs` keeps the normal MVP behaviour and does not register `Alt + E`. The local v0.2.0 executable enables paragraph reading by default; the older v0.1.0 download does not support it.
+Source mode without `--paragraphs` keeps the normal MVP behaviour and does not register `Alt + E`. The v0.3.0 portable entries enable paragraph reading by default; the older v0.1.0 download does not support it.
 
 ### Inspect a real paragraph
 

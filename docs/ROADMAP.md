@@ -26,7 +26,7 @@ The sequence expresses priorities, not guaranteed completion dates. A version ca
 
 Source and portable acceptance passed on 2026-10-01: the user confirmed paragraph starts, same-reply endings, switching starts/replies and playback controls in the actual target app, followed by the packaged executable. The portable preview also passed startup/control/exit and bundled-worker checks. Only desktop package `OpenAI.Codex_26.928.3736.0_x64__2p2nqsd0c76g0` is accepted. Editable writing blocks, tables, user messages, other apps and unknown layouts are outside paragraph-reading scope. Keep v0.1.0 as the selected-text-only fallback.
 
-v0.2.1 settings acceptance remains open. On 2026-10-01 the user explicitly prioritized the GUI before the reported latency/opening-audio and unsupported-block fixes. The local v0.3.0 candidate adds GUI/tray/language selection without resolving those reports or expanding paragraph scope. No publication is implied. Login startup, voice/backend and volume are deferred. Native process creation can briefly delay paragraph startup; collector tests do not prove instantaneous launch.
+v0.2.1 settings acceptance remains open. On 2026-10-01 the user explicitly prioritized the GUI before the reported latency/opening-audio and unsupported-block fixes. The v0.3.0 preview adds GUI/tray/language selection and bounded skipping with omission notices. Tested ordinary/table/editor/file workflows are user-confirmed after a Codex update; ISSUE-001 audio reports remain open. See the v0.3.0 release notes for verified scope. Login startup, voice/backend and volume are deferred. Native process creation can briefly delay paragraph startup; collector tests do not prove instantaneous launch.
 
 Acceptance areas checked for this preview:
 
@@ -35,7 +35,7 @@ Acceptance areas checked for this preview:
 3. Build and test the bounded extraction rule: current paragraph through the end of the same assistant reply.
 4. Integrate extraction with existing playback controls, then verify it against the actual app and state which app/version was tested.
 
-The preview skips code blocks and treats a list item as a starting block; selected-text reading still reads the selection. These are not capabilities of v0.1.0. Next: accept the floating UI, then diagnose ISSUE-001 and implement verified safe skipping for ISSUE-002. Do not expand inspected app/build scope silently. Candidate notes: [v0.3.0](releases/v0.3.0.md).
+The preview skips code blocks and treats a list item as a starting block; selected-text reading still reads the selection. These are not capabilities of v0.1.0. Next: diagnose ISSUE-001 and verify only reproduced additional layouts for ISSUE-002. Do not expand inspected app/build scope silently. Release notes: [v0.3.0](releases/v0.3.0.md).
 
 If the app does not expose enough structure, record the limitation and keep v0.1.0 working. A local reading panel into which the user explicitly copies one complete reply is a possible fallback, but it must be presented as a separate workflow; it is not the same as reading directly from a paragraph in Codex/ChatGPT. Do not silently change the product into a browser extension or claim desktop support without evidence.
 
@@ -51,4 +51,4 @@ If the app does not expose enough structure, record the limitation and keep v0.1
 
 Sentence navigation, remembering reading position across sessions, synchronized highlighting, hover-to-read buttons and additional app adapters remain candidates after the core workflow is reliable. Voice cloning, a full screen-reader replacement and automatic background reading of every chat are outside the current plan.
 
-2026-10-02 clarification: the local candidate adds disclosed skipping for recognized blocks (ISSUE-002/007). This notice is not highlighting. The requested later visual feature should distinguish the planned readable paragraphs, omitted regions and current audible position; it must not claim that planned/submitted text has already been heard. Evaluate paragraph overlays without changing Codex content, plus scroll/move/DPI changes, cancellation and privacy. No original-text coloring or synchronized progress is implemented or promised for this candidate.
+2026-10-02 clarification: v0.3.0 adds disclosed skipping for recognized blocks (ISSUE-002/007). This notice is not highlighting. The requested later visual feature should distinguish the planned readable paragraphs, omitted regions and current audible position; it must not claim that planned/submitted text has already been heard. Evaluate paragraph overlays without changing Codex content, plus scroll/move/DPI changes, cancellation and privacy. No original-text coloring or synchronized progress is implemented or promised for this preview.

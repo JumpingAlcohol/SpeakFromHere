@@ -12,9 +12,9 @@ Decided 2026-10-01 / 确定于 2026-10-01.
 
 **Main promise:** choose where to start listening and keep the reply boundary—not a new general-purpose screen reader, a browser extension, or a replacement AI chat app.
 
-**Current truth:** paragraph-level starting points only, limited to the inspected Codex desktop package recorded in CONTEXT.md. “Exactly where you want” is the product direction, not arbitrary word/sentence seeking. Other copyable selections can use Alt+S. The unpublished local candidate skips recognized code blocks, table/editor boundaries, inspected collapsed edited-files regions and simple post-reply activity metadata, with an omission notice and Details. The user confirmed tested editable-block/file skipping. A real wrapped grid/table and known standalone footer controls now pass post-fix extraction; the user now confirms ordinary/table reading after updating Codex. This does not prove compatibility with all future layouts. Unknown or unsafe boundaries still reject. Playback/pause latency and missing opening audio remain reported issues.
+**Current truth:** paragraph-level starting points only, limited to the inspected Codex desktop package recorded in CONTEXT.md. “Exactly where you want” is the product direction, not arbitrary word/sentence seeking. Other copyable selections can use Alt+S. The v0.3.0 preview skips recognized code blocks, table/editor boundaries, inspected collapsed edited-files regions and simple post-reply activity metadata, with an omission notice and Details. The user confirmed tested editable-block/file skipping. A real wrapped grid/table and known standalone footer controls now pass post-fix extraction; the user now confirms ordinary/table reading after updating Codex. This does not prove compatibility with all future layouts. Unknown or unsafe boundaries still reject. Playback/pause latency and missing opening audio remain reported issues.
 
-The current local candidate uses Windows package identity plus the inspected reply structure, not an exact numeric version. An unchanged number or a similar interface is not proof of compatibility; other applications still need separate inspected adapters. [Compatibility policy](APP_COMPATIBILITY.md).
+The v0.3.0 preview uses Windows package identity plus the inspected reply structure, not an exact numeric version. An unchanged number or a similar interface is not proof of compatibility; other applications still need separate inspected adapters. [Compatibility policy](APP_COMPATIBILITY.md).
 
 **Highlights:** pointer-to-paragraph + hotkey; completed assistant-reply ownership and ending boundary; native Windows desktop workflow; explicit selected-text fallback with fresh-clipboard validation; local Windows speech. These form a positioning combination, not proof of exclusive features or superior audio quality. [Primary-source comparison](COMPETITIVE_POSITIONING.md).
 
@@ -34,9 +34,9 @@ Do not claim “first,” “only,” “best,” universal app support, instant
 
 **核心价值：**决定从哪里开始听，并知道该在哪里停止。不是重新做一个通用屏幕阅读器、浏览器插件或 AI 聊天客户端。
 
-**当前真实能力：**仅段落级起读，只支持 CONTEXT.md 中记录的已检查 Codex 桌面应用包。“从你想听的位置开始”表达产品方向，不是任意字／句精确跳播。其他可复制选择可用 Alt+S。未发布本地候选版会跳过已识别的代码块、表格／编辑块边界、已检查的折叠文件区域及回复后的简单活动状态，并显示跳过提示与详情。用户已确认测试过的编辑块／文件跳过成功。真实 grid／表格容器和已知独立页尾控件现通过修改后提取；用户现已确认更新 Codex 后普通段落／表格测试通过，不代表所有未来布局兼容。未知或不安全边界仍拒读。播放／暂停延迟和首次开头丢字仍是待处理反馈。
+**当前真实能力：**仅段落级起读，只支持 CONTEXT.md 中记录的已检查 Codex 桌面应用包。“从你想听的位置开始”表达产品方向，不是任意字／句精确跳播。其他可复制选择可用 Alt+S。v0.3.0 预览版会跳过已识别的代码块、表格／编辑块边界、已检查的折叠文件区域及回复后的简单活动状态，并显示跳过提示与详情。用户已确认测试过的编辑块／文件跳过成功。真实 grid／表格容器和已知独立页尾控件现通过修改后提取；用户现已确认更新 Codex 后普通段落／表格测试通过，不代表所有未来布局兼容。未知或不安全边界仍拒读。播放／暂停延迟和首次开头丢字仍是待处理反馈。
 
-当前本地候选版使用 Windows 包身份及已检查的回复结构，不再绑定精确数字版本。相同版本号或相似界面不代表兼容；其他应用仍须单独检查和适配。[兼容策略](APP_COMPATIBILITY.md)。
+v0.3.0 预览版使用 Windows 包身份及已检查的回复结构，不再绑定精确数字版本。相同版本号或相似界面不代表兼容；其他应用仍须单独检查和适配。[兼容策略](APP_COMPATIBILITY.md)。
 
 **差异化亮点：**鼠标定位段落＋快捷键；识别已完成 AI 回复的归属与末尾；原生 Windows 桌面工作流；验证新剪贴板的主动选文兜底；本地 Windows 语音。这是定位组合，不证明功能独有或音质领先。详见[一手来源对比](COMPETITIVE_POSITIONING.md)。
 
