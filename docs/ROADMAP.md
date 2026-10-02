@@ -1,4 +1,4 @@
-# AI Chat Reader version plan
+# SpeakFromHere version plan
 
 [English](ROADMAP.md) | [简体中文](ROADMAP.zh-CN.md)
 
@@ -14,8 +14,8 @@ The initial target is the user's Codex/ChatGPT desktop workflow. Support for add
 | --- | --- | --- |
 | **v0.1.0 — MVP preview** | Selected-text reading, pause/resume, stop/exit, portable Windows executable, English and Chinese documentation. | Consecutive selections read correctly; failed copying never reads stale text; both exit methods work; the isolated executable launches twice and releases its hotkeys; the ZIP includes both guides. |
 | **v0.2.0 — Paragraph reading preview** | Identify the paragraph under the mouse and its assistant reply; read from that paragraph to the reply's end. Retain `Alt + S`; plan `Alt + E` for paragraph reading. | Starting from the first, middle and last paragraph works in the verified target app. It never crosses into another reply, a user message, the input box or reply controls. Unsupported locations report a clear message and preserve selected-text reading. |
-| **v0.2.1 — Reading settings** | Configurable shortcuts, reading speed and persisted preferences; clearer feedback on shortcut conflicts and unavailable content. | Settings survive restart, hotkey changes release the old binding, and invalid or conflicting settings do not silently disable the reader. |
-| **v0.3.0 — Desktop interface** | A compact control window and system tray, visible playback state, English/Chinese UI switching and an optional user-controlled startup setting. | Common controls and settings are usable without a terminal. Closing/minimizing behaviour is clear, exit frees resources, and the selected UI language persists. |
+| **v0.2.1 — Reading settings** | Persisted local SAPI rate and configurable pause/stop/exit keys; fixed Alt+S/Alt+E paths; clearer conflicts and manual fallback feedback. | Settings survive restart, old bindings are released on exit, invalid configurations are preserved with defaults/warnings, and conflicting changes are refused. |
+| **v0.3.0 — Desktop interface** | Bottom-right floating player, tray, playback state, replay, rate controls, persisted English/Chinese UI and control-key settings. Login startup deferred to a separate opt-in follow-up. | Double-click without a terminal; player controls preserve target focus, hide/restore works, exit releases resources, preferences persist. Real-chat/audio check remains required. |
 | **v0.4.0 — Voice options** | Voice selection, a replaceable speech backend and an optional more natural speech source. Local Windows speech remains available. | Changing voice does not break controls. Pause/stop/cancel work with each supported backend. Online speech is enabled explicitly and shows connectivity, cost and text-processing requirements; errors allow returning to local speech. |
 | **v0.9.0 — Public beta** | Compatibility checks, long-reply reliability, clean-install packaging and feedback-driven fixes. | Verified Windows/app combinations are documented. Long replies, repeated use, interruptions and upgrades pass the release checklist. Downloads work without a Python install; unsupported environments fail clearly. |
 | **v1.0.0 — Stable release** | A reliable, documented core workflow for the supported target environment. | Paragraph reading, selected-text fallback, playback controls, settings and the desktop interface are verified. No known blocking issue remains in the stated support scope, and a previous working release remains downloadable. |
@@ -26,6 +26,8 @@ The sequence expresses priorities, not guaranteed completion dates. A version ca
 
 Source and portable acceptance passed on 2026-10-01: the user confirmed paragraph starts, same-reply endings, switching starts/replies and playback controls in the actual target app, followed by the packaged executable. The portable preview also passed startup/control/exit and bundled-worker checks. Only desktop package `OpenAI.Codex_26.928.3736.0_x64__2p2nqsd0c76g0` is accepted. Editable writing blocks, tables, user messages, other apps and unknown layouts are outside paragraph-reading scope. Keep v0.1.0 as the selected-text-only fallback.
 
+v0.2.1 settings acceptance remains open. On 2026-10-01 the user explicitly prioritized the GUI before the reported latency/opening-audio and unsupported-block fixes. The local v0.3.0 candidate adds GUI/tray/language selection without resolving those reports or expanding paragraph scope. No publication is implied. Login startup, voice/backend and volume are deferred. Native process creation can briefly delay paragraph startup; collector tests do not prove instantaneous launch.
+
 Acceptance areas checked for this preview:
 
 1. Check whether Windows accessibility interfaces provide reply text, paragraph order and reliable reply ownership in the target app.
@@ -33,7 +35,7 @@ Acceptance areas checked for this preview:
 3. Build and test the bounded extraction rule: current paragraph through the end of the same assistant reply.
 4. Integrate extraction with existing playback controls, then verify it against the actual app and state which app/version was tested.
 
-The preview skips code blocks and treats a list item as a starting block; selected-text reading continues to read exactly what the user selects. These are not capabilities of the v0.1.0 download. Next milestone: v0.2.1 reading settings, after publication and feedback. Do not quietly expand the verified app/build scope.
+The preview skips code blocks and treats a list item as a starting block; selected-text reading still reads the selection. These are not capabilities of v0.1.0. Next: accept the floating UI, then diagnose ISSUE-001 and implement verified safe skipping for ISSUE-002. Do not expand inspected app/build scope silently. Candidate notes: [v0.3.0](releases/v0.3.0.md).
 
 If the app does not expose enough structure, record the limitation and keep v0.1.0 working. A local reading panel into which the user explicitly copies one complete reply is a possible fallback, but it must be presented as a separate workflow; it is not the same as reading directly from a paragraph in Codex/ChatGPT. Do not silently change the product into a browser extension or claim desktop support without evidence.
 
@@ -48,3 +50,5 @@ If the app does not expose enough structure, record the limitation and keep v0.1
 ## Deferred beyond the core release
 
 Sentence navigation, remembering reading position across sessions, synchronized highlighting, hover-to-read buttons and additional app adapters remain candidates after the core workflow is reliable. Voice cloning, a full screen-reader replacement and automatic background reading of every chat are outside the current plan.
+
+2026-10-02 clarification: the local candidate adds disclosed skipping for recognized blocks (ISSUE-002/007). This notice is not highlighting. The requested later visual feature should distinguish the planned readable paragraphs, omitted regions and current audible position; it must not claim that planned/submitted text has already been heard. Evaluate paragraph overlays without changing Codex content, plus scroll/move/DPI changes, cancellation and privacy. No original-text coloring or synchronized progress is implemented or promised for this candidate.

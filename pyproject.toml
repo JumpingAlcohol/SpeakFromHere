@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai-chat-reader"
-version = "0.2.0"
-description = "A lightweight Windows reader for selected text and verified AI reply paragraphs."
+version = "0.3.0"
+description = "SpeakFromHere: a reply-aware Windows desktop reader for AI responses, starting at your chosen paragraph."
 requires-python = ">=3.11"
 dependencies = [
     "pyperclip>=1.9,<2.0",

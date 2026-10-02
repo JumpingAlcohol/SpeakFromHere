@@ -1,30 +1,103 @@
-AI Chat Reader v0.2.0 — Windows portable preview
-
+SpeakFromHere v0.3.0 — Floating-player candidate (tested reading workflows user-confirmed)
 English: QuickStart.en.txt | 简体中文: QuickStart.zh-CN.txt
 
-Extract the ZIP before running. Close any reader already running in VS Code or another terminal to avoid hotkey conflicts.
-Double-click AIChatReader.exe. Python and dependencies are included; no separate installation is needed.
-Keep the status window open or minimized. Runtime status messages currently use English.
+Read AI responses aloud from exactly where you want.
+Reply-aware listening from a supported paragraph's beginning to the end of the
+same completed AI reply, not arbitrary word/sentence seeking.
+Formerly AI Chat Reader; original module/settings paths are retained.
+This is a local candidate, not a newly published download.
 
-Alt + S: Read selected text. Release both keys after pressing the shortcut.
-Alt + E: Point at ordinary text in a completed AI reply and read from that paragraph to the reply's end. No selection needed.
-Alt + P: Pause; press again to resume from the same position.
-Alt + X: Stop speech while keeping the reader running.
-Alt + Shift + Q: Exit the reader.
-Ctrl + C: Exit from the reader's status window.
+START
+Exit other readers, extract the ZIP, double-click SpeakFromHere.exe.
+Extract the ENTIRE ZIP. Keep reader-worker/ beside the main executables;
+do not move only the exe. Alt+E needs the helper and its _internal runtime.
+No terminal, Python installation or API key needed. Only run one instance.
+The topmost player opens at the bottom right above the taskbar. Drag its title.
 
-First check: select a passage in your chat, press Alt + S, and confirm the Reading preview in the status window is correct.
-While reading, try pause, resume and stop, then select a different passage and start reading again.
-Reading a new selection while paused starts the new text immediately. Stopping clears the reading position.
+READ AND CONTROL
+Alt + S: Read selected copyable text; release both keys.
+Alt + E: Point at supported ordinary text in a completed reply; read from that
+         paragraph to the same reply's end. Keep the mouse still during capture.
+Alt + P: Pause/resume (default).
+Alt + X: Stop (default).
+Alt + Shift + Q: Exit (default).
+Play/Pause: pause/resume; when idle, replay last submitted text from the beginning.
+Disabled until the first read. Stop clears position, not replay text.
+Clicking the player does not capture a new selection or guess a paragraph.
+Normal buttons do not activate the window; the settings dialog accepts typing.
+− / +: SAPI rate -10..10, default 0; slow/normal/fast, NOT exact multipliers.
+Rate changes are submitted immediately without restarting speech. The current
+voice reportedly changes gradually during playback; timing may lag and vary
+by voice/buffering, and has not been independently measured.
+中文 / EN: Switch and save GUI language. Detailed diagnostics remain English.
+Details: On an error/warning, expand the complete selectable English message.
+No automatic copying/saving/upload. Identity errors name the API and Windows code.
+Skipped notice: shows omitted types/counts, including blocks before your start.
+Details lists ordered reply-block numbers and before-start/remaining-reply positions.
+No skipped text or file names in this memory-only list. It is NOT original-text
+highlighting or synchronized progress. New reads replace it; pause/replay preserve it.
+⚙: Edit pause/stop/exit keys; restart to apply. Alt+S / Alt+E stay fixed.
+—: Hide to tray. Click the notification-area icon to restore.
+×: Exit and release shortcuts. No startup-at-login option in this candidate.
 
-The preview shows only the first 100 characters. The full text is read aloud.
-Simulated copying replaces the clipboard contents. The target app must support Ctrl + C for its selection.
-Speech uses a locally installed Windows voice; no API key or online speech service is required.
-Paragraph reading is limited to the inspected Codex desktop build 26.928.3736.0 (OpenAI.Codex package).
-It handles ordinary AI reply text, headings and recognized lists, and skips code blocks.
-Tables, editable writing blocks, your own messages and other apps are not supported by Alt + E; use Alt + S instead.
-App updates and incomplete/unknown layouts report a reason, rather than guessing reply boundaries.
-Paragraph capture does not copy, click or upload text. Pause, stop and exit cancel a pending capture.
-Source and portable modes passed the user's paragraph/audio check on the development Windows 11 x64 machine.
-Compatibility with other computers and app builds is not yet established.
-Windows 10/11, x64. Run only one reader instance at a time.
+SETTINGS AND PRIVACY
+%LOCALAPPDATA%\AIChatReader\settings.json (schema 2) stores only rate, control
+keys and GUI language, never chat/credentials. Replay text is memory-only,
+cleared on exit. Preview: at most 100 characters (panel may display less);
+speech uses full text. Copying replaces clipboard; target must support Ctrl+C.
+Windows may restrict copying from administrator-run apps.
+Control keys: Alt+LETTER or Alt+Shift+LETTER, A-Z; no duplicates/reserved keys.
+External hotkey conflicts are named at startup; acquired keys are released.
+Old schema 1 loads unchanged; explicit saving upgrades to schema 2.
+Back up before downgrading: v0.2.1 rejects schema 2 and warns/uses defaults.
+Missing files use defaults. Invalid files are preserved with warning/defaults;
+direct updates refused. After backup, explicitly confirm Reset to replace them.
+
+ADVANCED CONSOLE (optional; not alongside the GUI)
+  .\SpeakFromHereConsole.exe --show-settings
+  .\SpeakFromHereConsole.exe --set-rate 2 --set-hotkey 'pause=Alt+J'
+  .\SpeakFromHereConsole.exe
+Console changes apply on restart. Ctrl+C exits console mode only.
+--settings-file PATH selects an isolated profile, not broader app support.
+--reset-settings explicitly overwrites preferences with defaults.
+
+BOUNDARIES AND CHECKS
+Local Windows SAPI; no natural/new voice backend added.
+Alt+E: Windows-verified OpenAI.Codex_2p2nqsd0c76g0 package family and its
+registered app/ChatGPT.exe only. Numeric updates do not reject by themselves;
+the inspected reply structure must still validate. Wrong apps, unpackaged
+lookalikes and changed/unsafe layouts reject. Future compatibility is not guaranteed.
+Older published readers retain their exact-version gate.
+Ordinary text/headings/links/recognized lists work; code and verified non-text
+leaf separators are skipped. Separators are not starting paragraphs.
+Earlier completed replies can remain readable while a newer reply generates,
+only with their own completion footer and a later same-transcript reply marker.
+The currently generating reply still rejects.
+Verified Copy footers may have plain or weekday-prefixed 24-hour clocks:
+"星期四23:43" / "Thursday 23:43". These text leaves are metadata, not speech
+or starting paragraphs. English full weekday names have synthetic tests only;
+abbreviations, AM/PM and other uninspected date formats may still reject.
+Recognized tables/table widgets, the known writing-block wrapper, inspected collapsed file
+summaries/rows and simple post-Copy activity status containers are omitted.
+Code omissions are also disclosed. Tested editor/file skips are user-confirmed.
+The inspected table widget includes its typed grid and bounded action overlay;
+ordinary/table reading is user-confirmed after a Codex update. Changed layouts may reject.
+Known Regenerate/More footer leaves are ignored only after verified Copy;
+unknown controls/hidden descendants still reject. English labels are synthetic-tested.
+Hovering a skipped block never guesses the next paragraph. Use Alt+S manually.
+Unknown/protected/ambiguous layouts and other apps still reject; no blanket skip.
+Incomplete/ambiguous captures reject; Alt+E never auto-copies on failure.
+Capture does not click/copy/save/upload; controls cancel pending capture.
+Both entries share a lightweight reader-worker; launch/collection run off the
+control thread. The 20-second deadline includes startup. Canceled late launches
+are cleaned up without speaking; shutdown may briefly wait for native startup.
+Open reports: Alt+S/pause delays and missing opening characters are NOT fixed.
+Skip notices are a subsequent parser feature, not original-text highlighting.
+
+Manual check: three new selections, pause/resume, stop/replay; change rate then
+read new text; language/restart; tray hide/restore; exit/restart; Alt+E first,
+middle and last paragraphs. Listen for opening characters and note delays.
+Test prose around skipped blocks; check notice/Details and no next-reply speech.
+Silent automated tests cannot replace real-chat/audio acceptance.
+Developed on Windows 11 x64. Intended Windows 10/11 x64; broader machine,
+app/build and language compatibility is not established. No private chats bundled.

@@ -19,10 +19,17 @@ import win32job
 @unittest.skipUnless(os.environ.get("CHAT_READER_PORTABLE_TESTS") == "1", "Opt-in portable worker fixture")
 class BundledWorkerTests(unittest.TestCase):
     def test_standalone_worker_loads_uia_and_rejects_a_nonchat_owned_window(self):
+        self.check_worker(helper=False)
+
+    def test_lightweight_unpacked_worker_loads_uia_outside_the_project(self):
+        self.check_worker(helper=True)
+
+    def check_worker(self, *, helper):
         """Missing bundled COM bindings or routing into speech breaks the worker result."""
         from chat_reader.uia_probe import WindowsUIA
-        source = Path(__file__).resolve().parents[1] / "outputs/v0.2.0/AIChatReader.exe"
-        self.assertTrue(source.is_file(), "Build the v0.2.0 portable preview first")
+        from chat_reader.windows_context import physical_coordinate_context
+        source = Path(__file__).resolve().parents[1] / "outputs/v0.3.0/SpeakFromHere/SpeakFromHere.exe"
+        self.assertTrue(source.is_file(), "Build the v0.3.0 windowed portable candidate first")
         ready, finished = threading.Event(), threading.Event()
         handles, errors = [], []
         name = "ReaderPackageTest_" + uuid.uuid4().hex
@@ -38,7 +45,7 @@ class BundledWorkerTests(unittest.TestCase):
                 registered = True
                 parent = win32gui.CreateWindowEx(
                     win32con.WS_EX_TOPMOST | win32con.WS_EX_TOOLWINDOW | 0x08000000,
-                    name, "AI Chat Reader package test", win32con.WS_POPUP | win32con.WS_VISIBLE | win32con.WS_CAPTION,
+                    name, "SpeakFromHere package test", win32con.WS_POPUP | win32con.WS_VISIBLE | win32con.WS_CAPTION,
                     40, 40, 340, 100, 0, 0, window_class.hInstance, None)
                 handles.append(parent)
                 handles.append(win32gui.CreateWindowEx(
@@ -69,17 +76,26 @@ class BundledWorkerTests(unittest.TestCase):
             child = uia.describe(uia.automation.ElementFromHandle(handles[1]))
             left, top, width, height = child["bounds"]
             point = (int(left + width / 2), int(top + height / 2))
-            self.assertEqual(handles[1], win32gui.WindowFromPoint(point), "Another window covers the fixture")
+            with physical_coordinate_context():
+                self.assertEqual(handles[1], win32gui.WindowFromPoint(point), "Another window covers the fixture")
             with tempfile.TemporaryDirectory(prefix="reader-portable-worker-") as folder:
-                executable = Path(folder) / "AIChatReader.exe"
-                shutil.copy2(source, executable)
+                executable = Path(folder) / "SpeakFromHere.exe"
+                if helper:
+                    worker_folder = source.parent / "reader-worker"
+                    self.assertTrue(worker_folder.is_dir(), "The portable helper runtime is missing")
+                    shutil.copytree(worker_folder, Path(folder) / "reader-worker")
+                    executable = Path(folder) / "reader-worker" / "SpeakFromHereWorker.exe"
+                    command = [str(executable)]
+                else:
+                    shutil.copy2(source, executable)
+                    command = [str(executable), "--paragraph-worker"]
                 # The job owns only this spawned process tree and kills it on cleanup.
                 job = win32job.CreateJobObject(None, name + "_job")
                 limits = win32job.QueryInformationJobObject(job, win32job.JobObjectExtendedLimitInformation)
                 limits["BasicLimitInformation"]["LimitFlags"] = win32job.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
                 win32job.SetInformationJobObject(job, win32job.JobObjectExtendedLimitInformation, limits)
                 process = subprocess.Popen(
-                    [str(executable), "--paragraph-worker", str(point[0]), str(point[1])], cwd=folder,
+                    command + [str(point[0]), str(point[1])], cwd=folder,
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8",
                     creationflags=subprocess.CREATE_NO_WINDOW)
                 try:
@@ -97,7 +113,7 @@ class BundledWorkerTests(unittest.TestCase):
                                 raise
                     self.assertEqual(1, process.returncode)
                     self.assertEqual("", stdout)
-                    self.assertIn("This app/build has not been inspected", stderr)
+                    self.assertIn("This app is not a verified Codex package", stderr)
                     self.assertNotIn("Traceback", stderr)
                 finally:
                     win32job.TerminateJobObject(job, 1)

@@ -1,4 +1,4 @@
-"""Windows entry point for AI Chat Reader."""
+"""Windows entry point for SpeakFromHere."""
 
 import argparse
 import ctypes
@@ -11,14 +11,33 @@ import win32com.client
 from pynput import keyboard
 
 from chat_reader.core import run_reader_loop
+from chat_reader.settings import Settings, SettingsError, load_settings, save_settings, settings_path, parse_hotkey
 
 
 class WindowsSpeaker:
     """Use SAPI asynchronously on the same thread that created the voice."""
 
-    def __init__(self, engine):
+    def __init__(self, engine, *, rate=0):
         self.engine = engine
+        self.engine.Rate = Settings(rate=rate).rate
         self.paused = False
+        self.last_text = ""
+
+    def set_rate(self, rate):
+        self.engine.Rate = Settings(rate=rate).rate
+
+    def playback_state(self):
+        if self.paused:
+            return "paused"
+        return "idle" if self.engine.WaitUntilDone(0) else "playing"
+
+    def play_pause(self):
+        if self.playback_state() != "idle":
+            return self.toggle_pause()
+        if not self.last_text:
+            return "idle"
+        self.speak(self.last_text)
+        return "replaying"
 
     def speak(self, text):
         if self.paused:
@@ -26,6 +45,7 @@ class WindowsSpeaker:
             self.paused = False
         # 1: async, 2: cancel previous speech, 16: plain text (never XML).
         self.engine.Speak(text, 1 | 2 | 16)
+        self.last_text = text
 
     def stop(self):
         if self.paused:
@@ -48,8 +68,10 @@ class WindowsSpeaker:
 class WindowsDesktop:
     """Windows hotkeys and clipboard; no work runs on a keyboard callback thread."""
 
-    def __init__(self, *, enable_paragraphs=False):
+    def __init__(self, *, enable_paragraphs=False, settings=None, hwnd=None):
         self.enable_paragraphs = enable_paragraphs
+        self.hwnd = hwnd
+        self.settings = settings or Settings()
         self.registered = []
         self.controller = keyboard.Controller()
         self.user32 = ctypes.WinDLL("user32", use_last_error=True)
@@ -57,20 +79,16 @@ class WindowsDesktop:
         self.user32.GetClipboardSequenceNumber.restype = ctypes.c_uint32
 
     def register(self):
-        bindings = [
-            (1, win32con.MOD_ALT | 0x4000, ord("S")),
-            (2, win32con.MOD_ALT | win32con.MOD_SHIFT | 0x4000, ord("Q")),
-            (3, win32con.MOD_ALT | 0x4000, ord("P")),
-            (4, win32con.MOD_ALT | 0x4000, ord("X")),
-        ]
+        labels = {1: "Alt + S", 2: self.settings.hotkeys["exit"],
+                  3: self.settings.hotkeys["pause"], 4: self.settings.hotkeys["stop"]}
         if self.enable_paragraphs:
-            bindings.append((5, win32con.MOD_ALT | 0x4000, ord("E")))
-        for hotkey_id, modifiers, key in bindings:
+            labels[5] = "Alt + E"
+        for hotkey_id, label in labels.items():
+            modifiers, key = parse_hotkey(label)
             try:
-                win32gui.RegisterHotKey(None, hotkey_id, modifiers, key)
+                win32gui.RegisterHotKey(self.hwnd, hotkey_id, modifiers | 0x4000, key)
             except Exception as error:
-                label = {1: "Alt + S", 2: "Alt + Shift + Q",
-                         3: "Alt + P", 4: "Alt + X", 5: "Alt + E"}[hotkey_id]
+                self.close()
                 raise RuntimeError(
                     f"Cannot register {label}. Close any other reader instance or app using this hotkey."
                 ) from error
@@ -112,30 +130,76 @@ class WindowsDesktop:
 
     def close(self):
         for hotkey_id in self.registered:
-            win32gui.UnregisterHotKey(None, hotkey_id)
+            win32gui.UnregisterHotKey(self.hwnd, hotkey_id)
         self.registered.clear()
 
 
 def run(argv=None):
-    parser = argparse.ArgumentParser(description="AI Chat Reader: selected text and optional experimental paragraphs.")
+    parser = argparse.ArgumentParser(description="SpeakFromHere: selected text and optional experimental paragraphs.")
+    parser.add_argument("--gui", action="store_true", help="Open the floating player (includes bounded Alt + E reading)")
     parser.add_argument("--paragraphs", action="store_true", default=bool(getattr(sys, "frozen", False)),
                         help="Enable Alt + E paragraph reading (default in the portable preview)")
     parser.add_argument("--paragraph-worker", nargs=2, type=int, help=argparse.SUPPRESS)
+    parser.add_argument("--settings-file", help="Override the local settings path (for isolated profiles/testing)")
+    parser.add_argument("--show-settings", action="store_true", help="Show settings without starting the reader")
+    parser.add_argument("--set-rate", type=int, metavar="N", help="Save speaking rate -10 to 10; restart reader to apply")
+    parser.add_argument("--set-hotkey", action="append", default=[], metavar="ACTION=CHORD",
+                        help="Save pause, stop or exit binding, e.g. pause=Alt+J; restart to apply")
+    parser.add_argument("--reset-settings", action="store_true", help="Explicitly replace settings with defaults")
     args = parser.parse_args(argv)
     if args.paragraph_worker is not None:
         from chat_reader.paragraph_worker import main
         raise SystemExit(main([str(value) for value in args.paragraph_worker]))
     try:
-        speaker = WindowsSpeaker(win32com.client.Dispatch("SAPI.SpVoice"))
-        desktop = WindowsDesktop(enable_paragraphs=args.paragraphs)
+        if args.reset_settings and (args.set_rate is not None or args.set_hotkey):
+            raise SettingsError("Use --reset-settings separately from other changes.")
+        path = args.settings_file or settings_path()
+        changed = args.set_rate is not None or bool(args.set_hotkey) or args.reset_settings
+        warning = None
+        try:
+            value = Settings() if args.reset_settings else load_settings(path)
+        except (SettingsError, OSError, UnicodeError) as error:
+            if changed:
+                raise SettingsError(f"Cannot modify settings: {error} Use --reset-settings explicitly to replace the file.") from error
+            warning = f"{error} Using defaults; file left unchanged."
+            if not args.gui:
+                print("Settings warning: " + warning, flush=True)
+            value = Settings()
+        if changed:
+            hotkeys = dict(value.hotkeys)
+            seen = set()
+            for assignment in args.set_hotkey:
+                action, separator, chord = assignment.partition("=")
+                if not separator or action not in hotkeys or action in seen:
+                    raise SettingsError("Use each action once: pause=CHORD, stop=CHORD or exit=CHORD. Alt + S / Alt + E are fixed.")
+                seen.add(action)
+                hotkeys[action] = chord
+            value = Settings(rate=value.rate if args.set_rate is None else args.set_rate, hotkeys=hotkeys,
+                             language=value.language)
+            save_settings(path, value)
+            print("Settings saved. Restart the reader to apply changes; running instances are unchanged.", flush=True)
+        if changed or args.show_settings:
+            print(f"Settings file: {path}\nRate: {value.rate}\nRead selection: Alt + S (fixed)\nParagraph: Alt + E (fixed; only when enabled)", flush=True)
+            for action, chord in value.hotkeys.items():
+                print(f"{action}: {chord}", flush=True)
+            return
+        if args.gui:
+            from chat_reader.gui import run_gui
+            return run_gui(path, value, enable_paragraphs=True, warning=warning)
+        print(f"Settings file: {path}", flush=True)
+        speaker = WindowsSpeaker(win32com.client.Dispatch("SAPI.SpVoice"), rate=value.rate)
+        desktop = WindowsDesktop(enable_paragraphs=args.paragraphs, settings=value)
         paragraph_reader = None
         if args.paragraphs:
             from chat_reader.paragraph_job import ParagraphCapture
             paragraph_reader = ParagraphCapture()
-        run_reader_loop(desktop, speaker, paragraph_reader=paragraph_reader,
+        run_reader_loop(desktop, speaker, paragraph_reader=paragraph_reader, settings=value,
                         report=lambda message: print(message, flush=True))
     except Exception as error:
-        print(f"Reader could not start: {error}", flush=True)
+        if args.gui:
+            ctypes.windll.user32.MessageBoxW(None, f"Reader could not start: {error}", "SpeakFromHere", 0x10)
+        else:
+            print(f"Reader could not start: {error}", flush=True)
         raise SystemExit(1) from error
 
 

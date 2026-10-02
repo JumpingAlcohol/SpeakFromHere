@@ -1,11 +1,18 @@
-# AI Chat Reader project rules
+# SpeakFromHere project rules
+
+## Brand and positioning
+
+- Public product name: `SpeakFromHere` (exact capitalization). Tagline: `Read AI responses aloud from exactly where you want.` Chinese supporting line: `AI 回复，从你想听的位置开始。`
+- Lead with reply-aware, paragraph-start listening in an inspected Windows Codex desktop build, not generic TTS. Always clarify paragraph granularity; no arbitrary-character/sentence-seeking or universal compatibility claim.
+- Read `docs/BRAND.md` and `docs/COMPETITIVE_POSITIONING.md` for copy. Do not claim first/only/best or name/trademark clearance. Open latency/audio-loss and unsupported-block issues remain open; no safe-skipping or natural-voice claims before verification.
+- Keep legacy repository URL, Python distribution/module, environment variables and local settings path compatible unless a separate migration is requested. Preserve historical release files/notes. New local bundles use `SpeakFromHere` filenames.
 
 ## Language policy
 
 - `README.md` is the primary English README. `README.zh-CN.md` is the complete Simplified Chinese version. Both start with reciprocal `English | 简体中文` links.
 - Keep both READMEs aligned whenever features, shortcuts, requirements, setup, tests, packaging, or limitations change. Do not update just one language.
 - Portable downloads include `QuickStart.en.txt` and `QuickStart.zh-CN.txt`. Their canonical sources are in `docs/`; the build copies them into the output and includes both in the ZIP.
-- Runtime status messages currently stay in English. Add an English/Chinese language selector when a dedicated GUI is implemented; do not claim this selector exists yet.
+- The GUI has a persisted English/Chinese selector. Console status and detailed diagnostics stay in English; maintain both GUI label dictionaries when changing controls. Historical releases do not acquire GUI support retroactively.
 - Keep code identifiers, commands, filenames and shortcut bindings consistent across languages. Chinese promotional materials can link directly to `README.zh-CN.md`; the GitHub landing page defaults to English.
 
 ## Generated files

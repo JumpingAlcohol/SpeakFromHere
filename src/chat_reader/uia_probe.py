@@ -1,6 +1,7 @@
 """Read-only, bounded UIA inspection; not a verified paragraph-reading adapter."""
 
 import time
+from chat_reader.windows_context import physical_coordinate_context
 
 
 class ProbeUnavailable(RuntimeError):
@@ -93,7 +94,8 @@ class WindowsUIA:
             self.cache.AddProperty(property_id)
 
     def element_at(self, point):
-        element = self.automation.ElementFromPoint(self.types.tagPOINT(*point))
+        with physical_coordinate_context():
+            element = self.automation.ElementFromPoint(self.types.tagPOINT(*point))
         return element if element else None
 
     def parent(self, element):
@@ -107,7 +109,8 @@ class WindowsUIA:
             child = self.walker.GetNextSiblingElement(child)
 
     def describe(self, element):
-        cached = element.BuildUpdatedCache(self.cache)
+        with physical_coordinate_context():
+            cached = element.BuildUpdatedCache(self.cache)
         def value(property_id, *, ignore_default=True):
             raw = cached.GetCachedPropertyValueEx(property_id, ignore_default)
             if isinstance(raw, (str, int, float, bool, tuple, list)):

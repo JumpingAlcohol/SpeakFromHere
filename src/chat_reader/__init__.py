@@ -1,1 +1,1 @@
-"""AI Chat Reader package."""
+"""SpeakFromHere package."""
