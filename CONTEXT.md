@@ -2,9 +2,9 @@
 
 ## Current milestone / 当前状态
 
-2026-10-02: user accepted the tested v0.3.1.dev1 workflow, then explicitly authorized committing and publishing v0.3.1. Version/guides promoted; runtime unchanged from the accepted candidate. Final source and portable checks pass. Publication is pending; latest verified public release remains v0.3.0 (ID 401708467, tag commit 20043c0272399753cd025c0ce654ac60a7f56e46). Do not move historical tags or modify their releases.
+2026-10-02: v0.3.1 preview published with explicit user authorization: https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.3.1 . Release ID 402300877, tag/source commit ffdd309c88a787c80e8e032543259905815d662b. All four public assets re-downloaded and hash-verified; notes match tagged source. Historical v0.1.0/v0.2.0/v0.3.0 IDs, notes, assets and tag refs verified unchanged. Final source/portable checks pass; runtime unchanged from user-accepted candidate. Later handoff-only commits do not move the release tag.
 
-用户确认候选版所测流程正常，并明确同意提交、发布 v0.3.1。最终源码和便携检查通过，正在准备发布；当前已核实的公开版仍为 v0.3.0。旧版标签／Release 不改。首读提示音是暂时方案，不是所有设备／长时间闲置吞字的全面修复。
+用户验收后明确授权，v0.3.1 预览版现已公开发布。四个附件重新下载校验一致，旧版标签／说明／附件未改。最终源码和便携检查通过；后续交接文档提交不移动发布标签。首读提示音是暂时方案，不是所有设备／长时间闲置吞字的全面修复。
 
 ## Product and invariants
 
@@ -59,4 +59,4 @@
 
 ## Next priority
 
-Finish authorized v0.3.1 commit/push/prerelease and public re-download/hash/old-release checks; record actual commit/ID afterward. Then v0.4.0 local Windows voice selection first, optional alternative backend later. Cloud provider/text transmission/cost requires explicit choice; no auto-upload/API-key requirement. Highlighting follows separate audible-position/scrolling/DPI/cancellation/privacy design. More natural voices and synchronized original-text coloring are not implemented. Fix further layouts only when reproduced and safely bounded.
+v0.3.1 publication/verification complete; do not republish or move its tag. Next: v0.4.0 local Windows voice selection first, optional alternative backend later. Cloud provider/text transmission/cost requires explicit choice; no auto-upload/API-key requirement. Highlighting follows separate audible-position/scrolling/DPI/cancellation/privacy design. More natural voices and synchronized original-text coloring are not implemented. Fix further layouts only when reproduced and safely bounded.
