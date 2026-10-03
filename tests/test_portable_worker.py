@@ -28,8 +28,8 @@ class BundledWorkerTests(unittest.TestCase):
         """Missing bundled COM bindings or routing into speech breaks the worker result."""
         from chat_reader.uia_probe import WindowsUIA
         from chat_reader.windows_context import physical_coordinate_context
-        source = Path(__file__).resolve().parents[1] / "outputs/v0.3.0/SpeakFromHere/SpeakFromHere.exe"
-        self.assertTrue(source.is_file(), "Build the v0.3.0 windowed portable candidate first")
+        source = Path(__file__).resolve().parents[1] / "outputs/v0.3.1/SpeakFromHere/SpeakFromHere.exe"
+        self.assertTrue(source.is_file(), "Build the local v0.3.1 candidate first")
         ready, finished = threading.Event(), threading.Event()
         handles, errors = [], []
         name = "ReaderPackageTest_" + uuid.uuid4().hex

@@ -28,9 +28,11 @@ Documentation and download instructions are available in English and Simplified 
 
 **v0.3.0 — Floating Player & Bounded Skipping Preview** adds a terminal-free player, persisted bilingual settings and visible omission notices for recognized nonreadable blocks. Playback-delay/opening-audio reports remain open. `Alt + S` and `Alt + E` remain fixed; no other paragraph-reading apps are enabled.
 
-[Download v0.3.0 preview](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.3.0) · [Previous v0.2.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.2.0) · [Previous v0.1.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.1.0) · [Version plan](docs/ROADMAP.md)
+[Download v0.3.1 preview](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.3.1) · [Previous v0.3.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.3.0) · [Previous v0.2.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.2.0) · [Previous v0.1.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.1.0) · [Version plan](docs/ROADMAP.md)
 
-Formerly **AI Chat Reader**. The existing repository URL, Python distribution `ai-chat-reader`, module `chat_reader`, environment flags and `%LOCALAPPDATA%\AIChatReader\settings.json` are retained. Historical v0.1.0/v0.2.0 downloads keep their original names and files. New portable builds use `outputs/v0.3.0/SpeakFromHere/`; the repository has not been renamed.
+**v0.3.1 — Audio Stability Preview**: GUI and console pause the waveform output owned by their SAPI voice, retaining its position for resume. Canceling a paused read discards that voice's queued buffers before SAPI replaces/stops it. Muted real-device regressions hold the position after a provisional 200 ms budget and exercise resume, rate changes, replacement, stop/replay and exit; this is not a zero-latency or universal-device claim. Each reader launch adds one soft **400 ms audible cue before the first nonempty read**, on the same voice/output, as a temporary opening-loss workaround approved by the user. Nothing plays merely on launch; resume, replay and subsequent reads do not repeat the cue. Empty/failed captures do not consume it, and a speech-submission error cancels queued audio. The cue respects this voice's volume. The user confirms the tested new-bundle workflow works; this does not establish every device or remedy clipping after a later long idle. Non-waveform/unopened outputs retain the SAPI pause path. No system volume or default device is changed. [Release notes](docs/releases/v0.3.1.md).
+
+Formerly **AI Chat Reader**. The existing repository URL, Python distribution `ai-chat-reader`, module `chat_reader`, environment flags and `%LOCALAPPDATA%\AIChatReader\settings.json` are retained. Historical downloads keep their original names and files. Current builds use `outputs/v0.3.1/SpeakFromHere/`; published v0.3.0 artifacts remain separate. The repository has not been renamed.
 
 ## Floating player (v0.3.0 preview)
 
@@ -74,7 +76,7 @@ If copying fails, it reports `No new text copied...` instead of reading old clip
 
 Double-click the new `SpeakFromHere.exe` for the floating GUI. Python, Tk and dependencies are included. `SpeakFromHereConsole.exe` is a separate advanced console entry for diagnostics/settings commands; do not run both at once.
 
-Both new portable entries enable `Alt + E` by default. Current builds are in `outputs/v0.3.0/SpeakFromHere/`; previous artifacts remain separate. The v0.1.0 download remains selected-text only.
+Both current portable entries enable `Alt + E` by default. Builds are in `outputs/v0.3.1/SpeakFromHere/`; previous artifacts remain separate. The v0.1.0 download remains selected-text only.
 
 The ZIP includes `SpeakFromHere.exe`, `SpeakFromHereConsole.exe`, `QuickStart.en.txt` and `QuickStart.zh-CN.txt`. Extract before running. Generated binaries stay in ignored `outputs/`, not Git.
 
@@ -143,6 +145,8 @@ Remove-Item Env:\CHAT_READER_WINDOWS_TESTS
 
 The integration tests use temporary audio files or mute only the test voice. They do not play audible speech or change system volume.
 
+`test_windows_audio.py` uses the actual console runtime's voice factory in timeout-bounded child processes and checks the device's rendered position, not just a successful `Pause()` return. File-only checks verify a modest, faded 400 ms cue precedes full plain-text speech only on the first read; replay/new text do not repeat it, and text-submission failure cancels it. It does not record system audio or establish that opening characters were audible.
+
 `CHAT_READER_GUI_TESTS=1` enables native player/tray tests. `CHAT_READER_UIA_TESTS=1` and `CHAT_READER_PORTABLE_TESTS=1` enable isolated UIA/bundle checks. Close the reader, enable the desired flags, run the suite, then clear them. GUI tests create only their own windows and temporary profiles, not private app captures.
 
 ## Build the Windows executable
@@ -154,7 +158,7 @@ On Windows, after creating the virtual environment:
 .\scripts\build.ps1
 ```
 
-Outputs are in `outputs/v0.3.0/SpeakFromHere/`: windowed `SpeakFromHere.exe`, advanced `SpeakFromHereConsole.exe`, `reader-worker/`, `SpeakFromHere-Windows-x64.zip` and `SHA256SUMS.txt`. No separate Python installation is needed. The ZIP includes both entries, the complete capture-helper runtime and canonical guides from `docs/`. Both entries launch the same lightweight helper without a terminal or another player, avoiding repeated unpacking/loading of the full reader. Extract and keep the whole folder together. Intermediate files stay in `work/`.
+Current outputs are in `outputs/v0.3.1/SpeakFromHere/`: windowed `SpeakFromHere.exe`, advanced `SpeakFromHereConsole.exe`, `reader-worker/`, `SpeakFromHere-Windows-x64.zip` and `SHA256SUMS.txt`. Published v0.3.0 files are not overwritten. No separate Python installation is needed. The ZIP includes both entries, the complete capture-helper runtime and canonical guides from `docs/`. Both entries launch the same lightweight helper without a terminal or another player, avoiding repeated unpacking/loading of the full reader. Extract and keep the whole folder together. Intermediate files stay in `work/`.
 
 The build uses [PyInstaller](https://pyinstaller.org/en/stable/usage.html): single-file main entries, a one-directory capture helper.
 
@@ -198,7 +202,7 @@ To check customized settings: save rate 2 and pause `Alt+J`, restart, verify sta
 
 Paragraph startup and collection now run off the control thread, with coordinates sampled when the command is handled. Pause/stop/new reads cancel even a pending process launch; late children are reaped and stale results are ignored. The 20-second deadline includes launch time. Exit releases controls first but process shutdown may wait briefly for a pending native launch to return so its child can be cleaned up. This does not establish a fix for SAPI or selected-text pause/start delays.
 
-Open user feedback: Alt+S playback can also start late, pauses are frequently delayed, and first playback may omit opening characters; causes are unconfirmed. The v0.3.0 preview skips recognized nonreadable regions with an omission notice. Unknown/protected/boundary-ambiguous structures can still reject the reply. See [known issues and acceptance requirements](docs/KNOWN_ISSUES.md). The user confirmed tested ordinary/table/editor/file workflows after a Codex update; separate audio reports and uninspected layouts remain open.
+Audio feedback: v0.3.1 improves the reproduced delayed-pause path and adds the approved first-read cue; the user confirms their tested workflow works. The cue is a workaround, not universal closure of opening loss, startup latency or hypothetical long-idle clipping. The v0.3.0 preview added recognized nonreadable-region skipping with an omission notice. Unknown/protected/boundary-ambiguous structures can still reject the reply. See [known issues and acceptance requirements](docs/KNOWN_ISSUES.md). The user confirmed tested ordinary/table/editor/file workflows after a Codex update; uninspected layouts remain open.
 
 The v0.3.0 preview corrects a GUI/worker display-scaling coordinate mismatch that could target a different application and report an identity error. Cursor sampling, UIA point lookup and paragraph bounds use the same physical-pixel coordinate space without changing Windows scaling or relaxing identity checks. Native regression coverage includes the development machine's scaled desktop; the user confirmed GUI paragraph reading was restored. Playback reports and uninspected-layout limitations remain open.
 

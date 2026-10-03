@@ -11,7 +11,7 @@ from chat_reader import app
 class GuiEntryTests(unittest.TestCase):
     def test_gui_launch_passes_preferences_without_starting_console_reader(self):
         with tempfile.TemporaryDirectory() as folder, patch("chat_reader.gui.run_gui") as gui, \
-                patch.object(app, "WindowsDesktop") as desktop, patch.object(app.win32com.client, "Dispatch") as voice:
+                patch.object(app, "WindowsDesktop") as desktop, patch.object(app, "create_windows_speaker") as voice:
             path = str(Path(folder) / "settings.json")
             app.run(["--gui", "--settings-file", path])
             self.assertEqual(path, gui.call_args.args[0])

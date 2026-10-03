@@ -3,6 +3,7 @@ import json
 import sys
 import tempfile
 from pathlib import Path
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -22,13 +23,23 @@ class PortableParagraphTests(unittest.TestCase):
 
     def run_reader(self, *, frozen, argv):
         engine = RecordingEngine()
+        # Only the external COM allocation is substituted; real cue generation,
+        # voice factory, speaker and paragraph/reader routing remain in use.
+        class MemoryStream:
+            def __init__(self):
+                self.Format = SimpleNamespace(Type=0)
+                self.data = None
+            def SetData(self, data):
+                self.data = data
+        stream = MemoryStream()
         messages = iter([(True, (0, app.win32con.WM_HOTKEY, 5, 0, 0, (0, 0))),
                          (True, (0, app.win32con.WM_QUIT, 0, 0, 0, (0, 0)))])
         with tempfile.TemporaryDirectory() as folder, \
                 patch("chat_reader.app.settings_path", return_value=Path(folder) / "settings.json"), \
                 patch.object(sys, "frozen", frozen, create=True), \
                 patch.object(app.keyboard, "Controller"), \
-                patch.object(app.win32com.client, "Dispatch", return_value=engine), \
+                patch("chat_reader.windows_audio.create_voice", return_value=engine), \
+                patch("chat_reader.windows_audio.comtypes.client.CreateObject", return_value=stream), \
                 patch.object(app.win32gui, "RegisterHotKey"), \
                 patch.object(app.win32gui, "UnregisterHotKey"), \
                 patch.object(app.win32gui, "PeekMessage", side_effect=messages), \
@@ -36,7 +47,7 @@ class PortableParagraphTests(unittest.TestCase):
                 patch("chat_reader.paragraph_job.ParagraphCapture", return_value=Capture()), \
                 patch.object(sys, "stdout", new=io.StringIO()):
             app.run(argv)
-        self.assertIn(("Middle.\n\nLast.", 19), engine.actions)
+        self.assertEqual([("stream", 3), ("Middle.\n\nLast.", 17)], engine.actions[:2])
         self.assertEqual(("", 3), engine.actions[-1])
 
     def test_internal_worker_returns_unicode_json_without_starting_speech_or_hotkeys(self):
@@ -55,7 +66,7 @@ class PortableParagraphTests(unittest.TestCase):
                 lookup_identity=lambda _: ParagraphWorkerTests().identity(), with_plan=with_plan)
         with patch("chat_reader.paragraph_worker.read_paragraph", side_effect=captured), \
                 patch.object(sys, "stdout", output), \
-                patch.object(app.win32com.client, "Dispatch", side_effect=AssertionError("Worker started speech")), \
+                patch("chat_reader.windows_audio.create_voice", side_effect=AssertionError("Worker started speech")), \
                 patch.object(app.win32gui, "RegisterHotKey", side_effect=AssertionError("Worker registered hotkeys")):
             with self.assertRaises(SystemExit) as raised:
                 app.run(["--paragraph-worker", "15", "45"])

@@ -30,9 +30,11 @@ v0.2.0 新增针对已检查桌面应用版本的段落到回复末尾朗读，�
 
 **v0.3.0 — 悬浮播放器与有边界跳过预览版**新增无需终端的播放器、持久保存的双语设置，以及已识别不可读块的省略提示。播放延迟／开头吞字仍待处理。`Alt + S` 和 `Alt + E` 保持固定，不开放其他应用的段落读取。
 
-[下载 v0.3.0 预览版](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.3.0) · [旧版 v0.2.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.2.0) · [旧版 v0.1.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.1.0) · [版本计划](docs/ROADMAP.zh-CN.md)
+[下载 v0.3.1 预览版](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.3.1) · [旧版 v0.3.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.3.0) · [旧版 v0.2.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.2.0) · [旧版 v0.1.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.1.0) · [版本计划](docs/ROADMAP.zh-CN.md)
 
-原名 **AI Chat Reader**。保留仓库地址、Python 分发名 `ai-chat-reader`、模块 `chat_reader`、测试环境变量及 `%LOCALAPPDATA%\AIChatReader\settings.json`。历史 v0.1.0／v0.2.0 下载名称与文件不改。新便携包构建到 `outputs/v0.3.0/SpeakFromHere/`，没有重命名远端仓库。
+**v0.3.1 — 音频稳定性预览版**：GUI 和终端入口暂停各自 SAPI 声源拥有的波形输出，保留继续播放的位置。取消暂停中的朗读时，先清除该声源已排队的音频，再由 SAPI 替换／停止文本。真实设备静音回归检查暂停后暂定 200 毫秒预算内播放位置保持不变，并覆盖恢复、变速、替换、停止／重播及退出；不承诺零延迟或所有设备兼容。经用户同意，每次启动后仅在首次非空朗读前，通过同一声源／输出加一次 **400 毫秒柔和有声提示音**，作为开头吞字的暂时方案。仅打开程序不发声；继续、重播及后续朗读不重复提示音。空选文／读取失败不消耗首读提示音，语音提交失败会取消已排队音频；提示音遵循本声源音量。用户确认新版所测流程正常，不代表所有设备兼容，不处理后续长时间闲置再起读的潜在吞字。非波形／尚未打开的输出保留 SAPI 暂停路径。不改变系统音量或默认音频设备。[发布说明](docs/releases/v0.3.1.md)。
+
+原名 **AI Chat Reader**。保留仓库地址、Python 分发名 `ai-chat-reader`、模块 `chat_reader`、测试环境变量及 `%LOCALAPPDATA%\AIChatReader\settings.json`。历史下载名称与文件不改。当前构建到 `outputs/v0.3.1/SpeakFromHere/`，已发布 v0.3.0 产物单独保留，没有重命名远端仓库。
 
 ## 悬浮播放器（v0.3.0 预览版）
 
@@ -76,7 +78,7 @@ v0.2.0 新增针对已检查桌面应用版本的段落到回复末尾朗读，�
 
 双击新的 `SpeakFromHere.exe` 启动悬浮界面，已包含 Python、Tk 和依赖。`SpeakFromHereConsole.exe` 是高级终端入口，用于诊断及设置命令；不要同时运行两者。
 
-两个新便携入口均默认启用 `Alt + E`。当前构建位于 `outputs/v0.3.0/SpeakFromHere/`，旧文件分开保留。v0.1.0 下载仍只支持选文朗读。
+两个当前便携入口均默认启用 `Alt + E`。构建位于 `outputs/v0.3.1/SpeakFromHere/`，旧文件分开保留。v0.1.0 下载仍只支持选文朗读。
 
 ZIP 包含 `SpeakFromHere.exe`、`SpeakFromHereConsole.exe`、`QuickStart.en.txt` 和 `QuickStart.zh-CN.txt`。请先解压再运行。二进制文件只放在被忽略的 `outputs/`，不提交到 Git。
 
@@ -145,6 +147,8 @@ Remove-Item Env:\CHAT_READER_WINDOWS_TESTS
 
 集成测试使用临时音频文件，或仅将测试语音实例静音；不会播放可听见的语音，也不会改变系统音量。
 
+`test_windows_audio.py` 在带超时的子进程中使用真实终端入口的声源工厂，检查设备已播放的位置，而不只判断 `Pause()` 是否返回成功。文件检查验证柔和、淡入淡出的 400 毫秒提示音仅在首读前出现，正文按纯文本完整生成，重播／新文本不重复提示音，正文提交失败取消音频。它不录制系统音频，也不能证明开头字已被听到。
+
 `CHAT_READER_GUI_TESTS=1` 启用原生播放器／托盘测试；`CHAT_READER_UIA_TESTS=1` 和 `CHAT_READER_PORTABLE_TESTS=1` 启用隔离 UIA／打包检查。先退出朗读器，启用所需标志，运行测试后清除。GUI 测试只创建自己的窗口和临时配置，不抓取私人应用。
 
 ## 构建 Windows 可执行文件
@@ -156,7 +160,7 @@ Remove-Item Env:\CHAT_READER_WINDOWS_TESTS
 .\scripts\build.ps1
 ```
 
-输出在 `outputs/v0.3.0/SpeakFromHere/`：无终端的 `SpeakFromHere.exe`、高级 `SpeakFromHereConsole.exe`、`reader-worker/`、`SpeakFromHere-Windows-x64.zip` 和 `SHA256SUMS.txt`。无需另装 Python。ZIP 包含两个入口、完整读取辅助程序及来自 `docs/` 的两份规范说明。两入口启动同一个轻量读取程序，不打开终端或另一个播放器，避免每次解包／载入完整朗读器。须完整解压并保留目录结构，中间文件位于 `work/`。
+当前输出在 `outputs/v0.3.1/SpeakFromHere/`：无终端的 `SpeakFromHere.exe`、高级 `SpeakFromHereConsole.exe`、`reader-worker/`、`SpeakFromHere-Windows-x64.zip` 和 `SHA256SUMS.txt`。不覆盖已发布 v0.3.0 文件。无需另装 Python。ZIP 包含两个入口、完整读取辅助程序及来自 `docs/` 的两份规范说明。两入口启动同一个轻量读取程序，不打开终端或另一个播放器，避免每次解包／载入完整朗读器。须完整解压并保留目录结构，中间文件位于 `work/`。
 
 构建采用 [PyInstaller](https://pyinstaller.org/en/stable/usage.html)：主入口为单文件，读取辅助程序为单目录。
 
@@ -200,7 +204,7 @@ GUI 可调整语速／语言并打开设置窗口；高级使用仍可用命令�
 
 段落进程启动及结果收集现均不占用控制线程，坐标在处理命令时采样。暂停／停止／新读取能取消尚在启动的任务，迟到进程仍会回收，旧结果不会触发朗读。20 秒期限包含启动时间。退出先释放控制，但程序关闭可能短暂等待系统启动返回，以回收它的子进程；不据此宣称修复 SAPI 或选文起读／暂停延迟。
 
-待处理用户反馈：Alt+S 也可能起读延迟，暂停频繁延迟，首次朗读可能吞掉开头的一两个字；原因尚未确认。v0.3.0 预览版可跳过已识别的不可读区域并明确提示；未知、受保护或边界不明结构仍可能整条拒读。详见[问题记录与验收要求](docs/KNOWN_ISSUES.md)。用户已确认更新 Codex 后所测普通段落／表格／编辑块／文件流程通过；独立听感反馈及未检查布局仍待处理。
+听感反馈：v0.3.1 改进已复现的暂停延迟，并加入用户同意的首读提示音；用户确认所测流程正常。提示音是暂时方案，不代表全面解决开头丢字、起读延迟或假设的长时间闲置吞字。v0.3.0 预览版新增了已识别不可读区域跳过及明确提示；未知、受保护或边界不明结构仍可能整条拒读。详见[问题记录与验收要求](docs/KNOWN_ISSUES.md)。用户已确认更新 Codex 后所测普通段落／表格／编辑块／文件流程通过；未检查布局仍待处理。
 
 v0.3.0 预览版修正 GUI／读取进程之间的显示缩放坐标不一致，原问题会定位到其他应用并报身份错误。鼠标取点、UIA 点定位及段落边界使用一致的物理像素坐标，不改变 Windows 缩放设置、不放宽身份检查。原生回归测试覆盖开发机器的缩放桌面；用户已确认 GUI 段落朗读恢复。播放反馈及未检查布局限制仍待处理。
 

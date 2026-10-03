@@ -7,7 +7,6 @@ import pyperclip
 import win32api
 import win32con
 import win32gui
-import win32com.client
 from pynput import keyboard
 
 from chat_reader.core import run_reader_loop
@@ -17,11 +16,25 @@ from chat_reader.settings import Settings, SettingsError, load_settings, save_se
 class WindowsSpeaker:
     """Use SAPI asynchronously on the same thread that created the voice."""
 
-    def __init__(self, engine, *, rate=0):
+    def __init__(self, engine, *, rate=0, audio_control=None, startup_cue=None):
         self.engine = engine
         self.engine.Rate = Settings(rate=rate).rate
         self.paused = False
         self.last_text = ""
+        self.audio_control = audio_control
+        self._output_paused = False
+        self.startup_cue = startup_cue
+
+    def _resume(self, *, cancel=False):
+        if self._output_paused:
+            if cancel:
+                self.audio_control.cancel()
+            else:
+                self.audio_control.resume()
+        else:
+            self.engine.Resume()
+        self._output_paused = False
+        self.paused = False
 
     def set_rate(self, rate):
         self.engine.Rate = Settings(rate=rate).rate
@@ -41,28 +54,51 @@ class WindowsSpeaker:
 
     def speak(self, text):
         if self.paused:
-            self.engine.Resume()
-            self.paused = False
-        # 1: async, 2: cancel previous speech, 16: plain text (never XML).
-        self.engine.Speak(text, 1 | 2 | 16)
+            self._resume(cancel=True)
+        # The first text appends to the cue on the SAME voice. Purging here
+        # would cancel the cue. Later reads retain ordinary replacement flags.
+        try:
+            cue_queued = bool(text.strip() and self.startup_cue and self.startup_cue.queue_once())
+            # 1: async, 2: cancel previous speech, 16: plain text (never XML).
+            self.engine.Speak(text, (1 | 16) if cue_queued else (1 | 2 | 16))
+        except Exception:
+            if self.startup_cue:
+                try:
+                    self.engine.Speak("", 1 | 2)
+                except Exception:
+                    pass  # Preserve the original submission error.
+            raise
         self.last_text = text
 
     def stop(self):
         if self.paused:
-            self.engine.Resume()
-            self.paused = False
+            # Release the paused writer by discarding only its queued buffers,
+            # immediately followed by SAPI's own utterance cancellation.
+            self._resume(cancel=True)
         self.engine.Speak("", 1 | 2)
 
     def toggle_pause(self):
         if self.paused:
-            self.engine.Resume()
-            self.paused = False
+            self._resume()
             return "resumed"
         if self.engine.WaitUntilDone(0):
             return "idle"
-        self.engine.Pause()
+        self._output_paused = bool(self.audio_control and self.audio_control.pause())
+        if not self._output_paused:
+            # Retain SAPI semantics for unopened devices/non-waveform streams.
+            if self.engine.WaitUntilDone(0):
+                return "idle"
+            self.engine.Pause()
         self.paused = True
         return "paused"
+
+
+def create_windows_speaker(*, rate=0):
+    """Both runtime entries use the same owned voice and output controller."""
+    from chat_reader.windows_audio import StartupCue, WaveOutputControl, create_voice
+    engine = create_voice()
+    return WindowsSpeaker(engine, rate=rate, audio_control=WaveOutputControl(engine),
+                          startup_cue=StartupCue(engine))
 
 
 class WindowsDesktop:
@@ -187,7 +223,7 @@ def run(argv=None):
             from chat_reader.gui import run_gui
             return run_gui(path, value, enable_paragraphs=True, warning=warning)
         print(f"Settings file: {path}", flush=True)
-        speaker = WindowsSpeaker(win32com.client.Dispatch("SAPI.SpVoice"), rate=value.rate)
+        speaker = create_windows_speaker(rate=value.rate)
         desktop = WindowsDesktop(enable_paragraphs=args.paragraphs, settings=value)
         paragraph_reader = None
         if args.paragraphs:

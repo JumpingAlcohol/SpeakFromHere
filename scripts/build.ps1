@@ -1,4 +1,4 @@
-param([string]$OutputDirectory = 'outputs\v0.3.0\SpeakFromHere', [switch]$Clean)
+param([string]$OutputDirectory = 'outputs\v0.3.1\SpeakFromHere', [switch]$Clean)
 $ErrorActionPreference = 'Stop'
 $projectDirectory = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $buildOutput = Join-Path $projectDirectory $OutputDirectory

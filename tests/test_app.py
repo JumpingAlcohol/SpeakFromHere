@@ -10,11 +10,16 @@ except ImportError:
 class RecordingEngine:
     def __init__(self):
         self.actions = []
+        self.Volume = 100
         self.Status = SimpleNamespace(RunningState=1)
 
     def Speak(self, text, flags):
         self.actions.append((text, flags))
         self.Status.RunningState = 2 if text else 1
+
+    def SpeakStream(self, stream, flags):
+        self.actions.append(("stream", flags))
+        self.Status.RunningState = 2
 
     def Pause(self):
         self.actions.append(("pause",))

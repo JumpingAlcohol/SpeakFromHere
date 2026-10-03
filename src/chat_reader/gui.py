@@ -423,13 +423,12 @@ class GuiDesktop:
 
 
 def run_gui(path, value, *, enable_paragraphs=True, warning=None):
-    from chat_reader.app import WindowsDesktop, WindowsSpeaker
+    from chat_reader.app import WindowsDesktop, create_windows_speaker
     from chat_reader.core import run_reader_loop
     from chat_reader.paragraph_job import ParagraphCapture
-    import win32com.client
     # Set DPI awareness before creating any Tk widgets, never change another app.
     ctypes.windll.user32.SetProcessDPIAware()
-    speaker = WindowsSpeaker(win32com.client.Dispatch("SAPI.SpVoice"), rate=value.rate)
+    speaker = create_windows_speaker(rate=value.rate)
     window = PlayerWindow(PlayerPreferences(path, value, speaker), enable_paragraphs=enable_paragraphs)
     desktop = GuiDesktop(window, WindowsDesktop(settings=value, enable_paragraphs=enable_paragraphs, hwnd=window.hwnd))
     try:

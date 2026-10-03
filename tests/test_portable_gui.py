@@ -19,14 +19,14 @@ import win32process
 class PortableGuiTests(unittest.TestCase):
     def test_zip_contains_gui_console_and_both_canonical_guides(self):
         root = Path(__file__).resolve().parents[1]
-        with zipfile.ZipFile(root / "outputs/v0.3.0/SpeakFromHere/SpeakFromHere-Windows-x64.zip") as archive:
+        with zipfile.ZipFile(root / "outputs/v0.3.1/SpeakFromHere/SpeakFromHere-Windows-x64.zip") as archive:
             files = {name for name in archive.namelist() if not name.endswith("/")}
             top = {"SpeakFromHere.exe", "SpeakFromHereConsole.exe", "QuickStart.en.txt", "QuickStart.zh-CN.txt"}
             self.assertEqual(top, {name for name in files if "/" not in name})
             self.assertIn("reader-worker/SpeakFromHereWorker.exe", files)
             self.assertIn("reader-worker/_internal/python312.dll", files)
             self.assertTrue(all(name in top or name.startswith("reader-worker/") for name in files))
-            helper = root / "outputs/v0.3.0/SpeakFromHere/reader-worker"
+            helper = root / "outputs/v0.3.1/SpeakFromHere/reader-worker"
             expected = {"reader-worker/" + path.relative_to(helper).as_posix()
                         for path in helper.rglob("*") if path.is_file()}
             self.assertEqual(expected, files - top, "ZIP must include every helper runtime file")
@@ -34,7 +34,7 @@ class PortableGuiTests(unittest.TestCase):
                 self.assertEqual((root / "docs" / name).read_bytes(), archive.read(name))
 
     def test_double_click_entry_shows_nonactivating_player_and_releases_actual_hotkeys_twice(self):
-        source = Path(__file__).resolve().parents[1] / "outputs/v0.3.0/SpeakFromHere/SpeakFromHere.exe"
+        source = Path(__file__).resolve().parents[1] / "outputs/v0.3.1/SpeakFromHere/SpeakFromHere.exe"
         self.assertTrue(source.is_file(), "Build the GUI candidate first")
         with tempfile.TemporaryDirectory(prefix="reader-gui-bundle-") as folder:
             executable = Path(folder) / "SpeakFromHere.exe"

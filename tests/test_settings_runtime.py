@@ -24,7 +24,7 @@ class SettingsRuntimeTests(unittest.TestCase):
     def command(self, argv):
         output = io.StringIO()
         with redirect_stdout(output), redirect_stderr(output), \
-                patch.object(app.win32com.client, "Dispatch", side_effect=AssertionError("Settings command started speech")), \
+                patch("chat_reader.windows_audio.create_voice", side_effect=AssertionError("Settings command started speech")), \
                 patch.object(app.keyboard, "Controller", side_effect=AssertionError("Settings command started desktop")):
             try:
                 app.run(["--settings-file", str(self.path), *argv])
@@ -71,7 +71,7 @@ class SettingsRuntimeTests(unittest.TestCase):
         save_settings(self.path, Settings(rate=-2, hotkeys={"pause": "Alt+J", "stop": "Alt+K", "exit": "Alt+Shift+L"}))
         engine = RecordingEngine()
         with redirect_stdout(io.StringIO()), patch.object(app.keyboard, "Controller"), \
-                patch.object(app.win32com.client, "Dispatch", return_value=engine), \
+                patch("chat_reader.windows_audio.create_voice", return_value=engine), \
                 patch.object(app.win32gui, "RegisterHotKey") as register, \
                 patch.object(app.win32gui, "UnregisterHotKey") as unregister, \
                 patch.object(app.win32gui, "PeekMessage", return_value=(True, (0, app.win32con.WM_QUIT, 0, 0, 0, (0, 0)))):
@@ -88,7 +88,7 @@ class SettingsRuntimeTests(unittest.TestCase):
         output = io.StringIO()
         engine = RecordingEngine()
         with redirect_stdout(output), patch.object(app.keyboard, "Controller"), \
-                patch.object(app.win32com.client, "Dispatch", return_value=engine), \
+                patch("chat_reader.windows_audio.create_voice", return_value=engine), \
                 patch.object(app.win32gui, "RegisterHotKey") as register, \
                 patch.object(app.win32gui, "UnregisterHotKey"), \
                 patch.object(app.win32gui, "PeekMessage", return_value=(True, (0, app.win32con.WM_QUIT, 0, 0, 0, (0, 0)))):

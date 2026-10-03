@@ -1,4 +1,4 @@
-SpeakFromHere v0.3.0 — Floating Player & Bounded Skipping Preview
+SpeakFromHere v0.3.1 — Audio Stability Preview
 English: QuickStart.en.txt | 简体中文: QuickStart.zh-CN.txt
 
 Read AI responses aloud from exactly where you want.
@@ -63,6 +63,13 @@ Console changes apply on restart. Ctrl+C exits console mode only.
 
 BOUNDARIES AND CHECKS
 Local Windows SAPI; no natural/new voice backend added.
+Temporary startup workaround: one soft 400ms audible cue before the FIRST
+nonempty read per launch, on the same voice/output. Opening the app is silent.
+Resume, replay and later reads do not repeat it; empty/failed captures leave it
+available. Speech-submission failure cancels queued audio. No cue setting yet.
+Synthetic cold-start cue trials preserved the opening word; the user confirms
+the tested new-bundle workflow works. This does not address long-idle clipping
+or establish all-device support. The cue respects this voice's volume.
 Alt+E: Windows-verified OpenAI.Codex_2p2nqsd0c76g0 package family and its
 registered app/ChatGPT.exe only. Numeric updates do not reject by themselves;
 the inspected reply structure must still validate. Wrong apps, unpackaged
@@ -91,7 +98,13 @@ Capture does not click/copy/save/upload; controls cancel pending capture.
 Both entries share a lightweight reader-worker; launch/collection run off the
 control thread. The 20-second deadline includes startup. Canceled late launches
 are cleaned up without speaking; shutdown may briefly wait for native startup.
-Open reports: Alt+S/pause delays and missing opening characters are NOT fixed.
+v0.3.1: pauses this voice's waveform output and retains its position;
+stopping/replacing a paused read clears its queued audio before SAPI cancellation.
+Muted real-device tests check position holding after a provisional 200ms budget,
+resume, rate changes, replacement, stop/replay and exit. Tested workflow user-confirmed.
+Non-waveform/unopened outputs retain ordinary SAPI pause behavior.
+No system-volume/default-device change. Opening-loss cue is a temporary workaround;
+there is no promise of zero delay or all-device support.
 Skip notices are a subsequent parser feature, not original-text highlighting.
 
 Manual check: three new selections, pause/resume, stop/replay; change rate then
