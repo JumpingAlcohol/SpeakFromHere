@@ -15,6 +15,10 @@ TEXT = {
            "save": "Save", "restart": "Control-key changes apply after restarting.", "language": "Language",
            "reset": "Reset settings", "reset_confirm": "Replace saved preferences with defaults?",
            "saved": "Settings saved", "diagnostic": "Details", "cancel": "Cancel",
+           "voice": "Local voice", "default_voice": "Windows default",
+           "voice_preview": "Save voice & preview", "voice_unavailable": "Saved voice unavailable",
+           "voice_hint": "Voice changes apply now while stopped. Preview saves the voice only.\nLocal SAPI voices; no automatic language switching or downloads.",
+           "voice_fallback": "Saved voice unavailable; using Windows default. Choose another voice.",
            "skipped": "Skipped {count} · {kinds}", "code": "Code", "table": "Table",
            "editor": "Editable block", "edited_files": "Edited-files region", "system_status": "System status"},
     "zh-CN": {"play": "播放", "pause": "暂停", "resume": "继续", "stop": "停止",
@@ -27,6 +31,10 @@ TEXT = {
               "save": "保存", "restart": "控制键修改后需重启生效。", "language": "语言",
               "reset": "重置设置", "reset_confirm": "将已保存偏好替换为默认值？",
               "saved": "设置已保存", "diagnostic": "详细信息", "cancel": "取消",
+              "voice": "本机声源", "default_voice": "Windows 默认",
+              "voice_preview": "保存声源并试听", "voice_unavailable": "已保存声源不可用",
+              "voice_hint": "停止朗读后切换立即生效；试听只保存声源选择。\n仅本机 SAPI 声源，不自动切换语言或下载声音。",
+              "voice_fallback": "已保存声源不可用，正在使用 Windows 默认；请选择其他声源。",
               "skipped": "已跳过 {count} 处 · {kinds}", "code": "代码块", "table": "表格",
               "editor": "可编辑块", "edited_files": "已编辑文件区域", "system_status": "系统状态条"},
 }
@@ -76,11 +84,21 @@ class PlayerPreferences:
 
     def _save(self, value):
         previous_rate = self.speaker.engine.Rate
-        self.speaker.set_rate(value.rate)
+        voice_changed = value.voice_id != self.value.voice_id
+        previous_voice = self.speaker.engine.Voice if voice_changed else None
+        previous_id, previous_warning = self.speaker.voice_id, self.speaker.voice_warning
+        voice_applied = False
         try:
+            if voice_changed:
+                self.speaker.set_voice(value.voice_id)
+                voice_applied = True
+            self.speaker.set_rate(value.rate)
             save_settings(self.path, value)
         except Exception:
             self.speaker.set_rate(previous_rate)
+            if voice_applied:
+                self.speaker.engine.Voice = previous_voice
+                self.speaker.voice_id, self.speaker.voice_warning = previous_id, previous_warning
             raise
         self.value = value
         return value

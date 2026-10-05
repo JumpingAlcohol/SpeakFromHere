@@ -18,7 +18,7 @@ The v0.3.0 preview uses Windows package identity plus the inspected reply struct
 
 **Highlights:** pointer-to-paragraph + hotkey; completed assistant-reply ownership and ending boundary; native Windows desktop workflow; explicit selected-text fallback with fresh-clipboard validation; local Windows speech. These form a positioning combination, not proof of exclusive features or superior audio quality. [Primary-source comparison](COMPETITIVE_POSITIONING.md).
 
-**Continuity:** formerly AI Chat Reader. Public documentation, runtime labels and new portable filenames use SpeakFromHere. For now keep `ai-chat-reader` distribution/repository slug, `chat_reader` module, existing environment flags and LOCALAPPDATA/AIChatReader/settings.json. Existing published downloads and historical notes retain their original names. Rebranding does not require resetting settings, renaming the checkout, or changing remote Git URLs. Remote rename/publication needs separate authorization.
+**Continuity:** formerly AI Chat Reader. The owner renamed the GitHub repository to `JumpingAlcohol/SpeakFromHere` on 2026-10-04; current links and local origin follow that verified URL. Keep `ai-chat-reader` distribution, `chat_reader` module, existing environment flags and LOCALAPPDATA/AIChatReader/settings.json. Existing published downloads and historical notes retain their original names. No checkout/settings-path migration. Publication still needs separate authorization.
 
 Do not claim “first,” “only,” “best,” universal app support, instant/zero-delay playback, natural voices, precise sentence/word seeking, highlighting, or universal unreadable-block skipping. Distinguish unpublished candidate behavior from shipped releases and synthetic checks from live acceptance. This independent project is not affiliated with OpenAI. The name is the user's choice; this work is not a trademark/domain/name-availability clearance.
 
@@ -40,6 +40,6 @@ v0.3.0 预览版使用 Windows 包身份及已检查的回复结构，不再绑�
 
 **差异化亮点：**鼠标定位段落＋快捷键；识别已完成 AI 回复的归属与末尾；原生 Windows 桌面工作流；验证新剪贴板的主动选文兜底；本地 Windows 语音。这是定位组合，不证明功能独有或音质领先。详见[一手来源对比](COMPETITIVE_POSITIONING.md)。
 
-**兼容性：**原名 AI Chat Reader。对外文档、运行提示和新的便携文件改用 SpeakFromHere。暂时保留 `ai-chat-reader` 分发名／仓库路径、`chat_reader` 模块、环境变量和 LOCALAPPDATA/AIChatReader/settings.json。已发布下载和历史说明保留旧名。改品牌不要求重置设置、改本地文件夹或远端 Git 地址；远端改名／发布需另行授权。
+**兼容性：**原名 AI Chat Reader。用户于 2026-10-04 将 GitHub 仓库改名为 `JumpingAlcohol/SpeakFromHere`，当前链接与本地 origin 使用已核实的新地址。保留 `ai-chat-reader` 分发名、`chat_reader` 模块、环境变量和 LOCALAPPDATA/AIChatReader/settings.json。已发布下载和历史说明保留旧名，不迁移本地目录／设置路径；发布仍需另行授权。
 
 不能宣传“首个”“唯一”“最好”、通用兼容、即时／零延迟、自然人声、字句级跳播、高亮或任意不可读块都能跳过。区分未发布候选版与已发布版本、合成测试与实机验收。本项目独立开发，与 OpenAI 无隶属关系。名字由用户指定，本次不是商标／域名／名称可用性审查。

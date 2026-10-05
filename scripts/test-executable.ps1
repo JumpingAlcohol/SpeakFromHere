@@ -1,4 +1,4 @@
-param([string]$ExecutablePath = 'outputs\v0.3.1\SpeakFromHere\SpeakFromHereConsole.exe')
+param([string]$ExecutablePath = 'outputs\v0.4.0\SpeakFromHere\SpeakFromHereConsole.exe')
 $ErrorActionPreference = 'Stop'
 $projectDirectory = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $sourceExecutable = Join-Path $projectDirectory $ExecutablePath

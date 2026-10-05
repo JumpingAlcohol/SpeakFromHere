@@ -37,8 +37,13 @@ class Settings:
     rate: int = 0
     hotkeys: object = field(default_factory=lambda: dict(DEFAULT_HOTKEYS))
     language: str = "en"
+    voice_id: str = ""  # Empty means the local SAPI default, not an online service.
 
     def __post_init__(self):
+        if (not isinstance(self.voice_id, str) or len(self.voice_id) > 1024
+                or self.voice_id != self.voice_id.strip()
+                or any(ord(char) < 32 or ord(char) == 127 for char in self.voice_id)):
+            raise SettingsError("Voice ID must be text without control characters (up to 1024 characters).")
         if self.language not in ("en", "zh-CN"):
             raise SettingsError("UI language must be en or zh-CN.")
         if type(self.rate) is not int or not -10 <= self.rate <= 10:
@@ -83,18 +88,20 @@ def load_settings(path):
     if not isinstance(document, dict):
         raise SettingsError("Settings file is not an object.")
     version = document.get("schema_version")
-    if type(version) is not int or version not in (1, 2):
-        raise SettingsError("Unsupported settings schema_version; expected 1 or 2. File left unchanged.")
-    allowed = {"schema_version", "rate", "hotkeys"} | ({"language"} if version == 2 else set())
+    if type(version) is not int or version not in (1, 2, 3):
+        raise SettingsError("Unsupported settings schema_version; expected 1, 2 or 3. File left unchanged.")
+    allowed = ({"schema_version", "rate", "hotkeys"} | ({"language"} if version >= 2 else set())
+               | ({"voice_id"} if version == 3 else set()))
     if set(document) - allowed:
         raise SettingsError("Settings file has unknown fields.")
     return Settings(rate=document.get("rate", 0), hotkeys=document.get("hotkeys", DEFAULT_HOTKEYS),
-                    language=document.get("language", "en"))
+                    language=document.get("language", "en"), voice_id=document.get("voice_id", ""))
 
 
 def save_settings(path, value):
-    value = Settings(rate=value.rate, hotkeys=value.hotkeys, language=value.language)
-    document = {"schema_version": 2, "rate": value.rate, "hotkeys": dict(value.hotkeys), "language": value.language}
+    value = Settings(rate=value.rate, hotkeys=value.hotkeys, language=value.language, voice_id=value.voice_id)
+    document = {"schema_version": 3, "rate": value.rate, "hotkeys": dict(value.hotkeys),
+                "language": value.language, "voice_id": value.voice_id}
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = None

@@ -1,4 +1,4 @@
-SpeakFromHere v0.3.1 — Audio Stability Preview
+SpeakFromHere v0.4.0 — Local Voice Selection Preview
 English: QuickStart.en.txt | 简体中文: QuickStart.zh-CN.txt
 
 Read AI responses aloud from exactly where you want.
@@ -36,25 +36,37 @@ Skipped notice: shows omitted types/counts, including blocks before your start.
 Details lists ordered reply-block numbers and before-start/remaining-reply positions.
 No skipped text or file names in this memory-only list. It is NOT original-text
 highlighting or synchronized progress. New reads replace it; pause/replay preserve it.
-⚙: Edit pause/stop/exit keys; restart to apply. Alt+S / Alt+E stay fixed.
+⚙: Choose local voice and edit control keys. Stop speech before switching voice;
+voice applies now, key changes require restart. Alt+S / Alt+E stay fixed.
+Save voice & preview saves only the voice and queues a fixed bilingual sample.
+Preview keeps the previous reply/omissions for replay and uses normal controls.
+It may consume this launch's first-read cue; saving/selecting alone is silent.
+Only SAPI-exposed installed voices are listed; no language auto-switch, download,
+registry workaround or online service. Single-language voices may skip other languages.
+Windows default affects this reader only. Missing/failed saved voice warns and falls
+back without rewriting the file. Choose another voice or explicitly reset it.
 —: Hide to tray. Click the notification-area icon to restore.
 ×: Exit and release shortcuts. No startup-at-login option in this preview.
 
 SETTINGS AND PRIVACY
-%LOCALAPPDATA%\AIChatReader\settings.json (schema 2) stores only rate, control
-keys and GUI language, never chat/credentials. Replay text is memory-only,
+%LOCALAPPDATA%\AIChatReader\settings.json (schema 3) stores only rate, control
+keys, GUI language and local voice ID, never chat/credentials. Replay text is memory-only,
 cleared on exit. Preview: at most 100 characters (panel may display less);
 speech uses full text. Copying replaces clipboard; target must support Ctrl+C.
 Windows may restrict copying from administrator-run apps.
 Control keys: Alt+LETTER or Alt+Shift+LETTER, A-Z; no duplicates/reserved keys.
 External hotkey conflicts are named at startup; acquired keys are released.
-Old schema 1 loads unchanged; explicit saving upgrades to schema 2.
-Back up before downgrading: v0.2.1 rejects schema 2 and warns/uses defaults.
+Old schema 1/2 loads unchanged with default voice; explicit save upgrades to schema 3.
+BACK UP BEFORE TESTING/DOWNGRADING: v0.3.1 and earlier reject schema 3 and use
+defaults with a warning. Do not reset your backup accidentally.
 Missing files use defaults. Invalid files are preserved with warning/defaults;
 direct updates refused. After backup, explicitly confirm Reset to replace them.
 
 ADVANCED CONSOLE (optional; not alongside the GUI)
   .\SpeakFromHereConsole.exe --show-settings
+  .\SpeakFromHereConsole.exe --list-voices
+  .\SpeakFromHereConsole.exe --set-voice 'TOKEN_ID_FROM_LIST'
+  .\SpeakFromHereConsole.exe --set-voice default
   .\SpeakFromHereConsole.exe --set-rate 2 --set-hotkey 'pause=Alt+J'
   .\SpeakFromHereConsole.exe
 Console changes apply on restart. Ctrl+C exits console mode only.
@@ -62,7 +74,9 @@ Console changes apply on restart. Ctrl+C exits console mode only.
 --reset-settings explicitly overwrites preferences with defaults.
 
 BOUNDARIES AND CHECKS
-Local Windows SAPI; no natural/new voice backend added.
+Local Windows SAPI selection only; no natural/new voice backend added.
+v0.4.0 adds local selection only; alternative backends are deferred. The user
+confirms tested English reading and restart retention; not all voices/languages.
 Temporary startup workaround: one soft 400ms audible cue before the FIRST
 nonempty read per launch, on the same voice/output. Opening the app is silent.
 Resume, replay and later reads do not repeat it; empty/failed captures leave it

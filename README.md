@@ -28,11 +28,19 @@ Documentation and download instructions are available in English and Simplified 
 
 **v0.3.0 — Floating Player & Bounded Skipping Preview** adds a terminal-free player, persisted bilingual settings and visible omission notices for recognized nonreadable blocks. Playback-delay/opening-audio reports remain open. `Alt + S` and `Alt + E` remain fixed; no other paragraph-reading apps are enabled.
 
-[Download v0.3.1 preview](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.3.1) · [Previous v0.3.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.3.0) · [Previous v0.2.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.2.0) · [Previous v0.1.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.1.0) · [Version plan](docs/ROADMAP.md)
+[Download v0.4.0 preview](https://github.com/JumpingAlcohol/SpeakFromHere/releases/tag/v0.4.0) · [Previous v0.3.1](https://github.com/JumpingAlcohol/SpeakFromHere/releases/tag/v0.3.1) · [Previous v0.3.0](https://github.com/JumpingAlcohol/SpeakFromHere/releases/tag/v0.3.0) · [Previous v0.2.0](https://github.com/JumpingAlcohol/SpeakFromHere/releases/tag/v0.2.0) · [Previous v0.1.0](https://github.com/JumpingAlcohol/SpeakFromHere/releases/tag/v0.1.0) · [Version plan](docs/ROADMAP.md)
 
 **v0.3.1 — Audio Stability Preview**: GUI and console pause the waveform output owned by their SAPI voice, retaining its position for resume. Canceling a paused read discards that voice's queued buffers before SAPI replaces/stops it. Muted real-device regressions hold the position after a provisional 200 ms budget and exercise resume, rate changes, replacement, stop/replay and exit; this is not a zero-latency or universal-device claim. Each reader launch adds one soft **400 ms audible cue before the first nonempty read**, on the same voice/output, as a temporary opening-loss workaround approved by the user. Nothing plays merely on launch; resume, replay and subsequent reads do not repeat the cue. Empty/failed captures do not consume it, and a speech-submission error cancels queued audio. The cue respects this voice's volume. The user confirms the tested new-bundle workflow works; this does not establish every device or remedy clipping after a later long idle. Non-waveform/unopened outputs retain the SAPI pause path. No system volume or default device is changed. [Release notes](docs/releases/v0.3.1.md).
 
-Formerly **AI Chat Reader**. The existing repository URL, Python distribution `ai-chat-reader`, module `chat_reader`, environment flags and `%LOCALAPPDATA%\AIChatReader\settings.json` are retained. Historical downloads keep their original names and files. Current builds use `outputs/v0.3.1/SpeakFromHere/`; published v0.3.0 artifacts remain separate. The repository has not been renamed.
+Formerly **AI Chat Reader**. The owner renamed the GitHub repository to **SpeakFromHere**. Python distribution `ai-chat-reader`, module `chat_reader`, environment flags and `%LOCALAPPDATA%\AIChatReader\settings.json` remain compatible. Historical downloads keep their names/files. Current builds use `outputs/v0.4.0/SpeakFromHere/`; all published versions remain separate.
+
+## Local voice selection (v0.4.0 preview)
+
+Open **⚙ Settings**, stop current speech, choose **Local voice**, then **Save**. **Save voice & preview** saves only the voice choice and queues a fixed bilingual sample; it does not capture text or replace your last reply for replay. Preview uses the usual controls and may consume the one-time first-read cue. Saving/selecting alone is silent. Voice changes apply to this running reader while stopped; control-key changes still require restart.
+
+The list contains only voices exposed to this process by local Windows SAPI, with language metadata. Selection persists by token ID, not list position or display name. **Windows default** uses the default captured for this reader without changing Windows settings. If a saved voice is removed or fails to load, startup warns and uses the local default without rewriting your preference; choose another voice or explicitly reset it. Busy/paused speech refuses a switch rather than losing its position. A failed preference write restores the previous runtime voice/rate.
+
+There is no automatic language switching, voice installation, OneCore/registry workaround, online service or naturalness guarantee. A language-specific voice may skip text in another language. SAPI enumeration/selection follows [Microsoft GetVoices/Voice documentation](https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee125639(v=vs.85)). The user confirms English reading and restart retention in the tested candidate. This release contains local selection only; optional alternative backends are deferred. It does not establish all-voice or mixed-language compatibility. [Release notes](docs/releases/v0.4.0.md).
 
 ## Floating player (v0.3.0 preview)
 
@@ -76,7 +84,7 @@ If copying fails, it reports `No new text copied...` instead of reading old clip
 
 Double-click the new `SpeakFromHere.exe` for the floating GUI. Python, Tk and dependencies are included. `SpeakFromHereConsole.exe` is a separate advanced console entry for diagnostics/settings commands; do not run both at once.
 
-Both current portable entries enable `Alt + E` by default. Builds are in `outputs/v0.3.1/SpeakFromHere/`; previous artifacts remain separate. The v0.1.0 download remains selected-text only.
+Both current portable entries enable `Alt + E` by default. Builds are in `outputs/v0.4.0/SpeakFromHere/`; previous artifacts remain separate. The v0.1.0 download remains selected-text only.
 
 The ZIP includes `SpeakFromHere.exe`, `SpeakFromHereConsole.exe`, `QuickStart.en.txt` and `QuickStart.zh-CN.txt`. Extract before running. Generated binaries stay in ignored `outputs/`, not Git.
 
@@ -158,7 +166,7 @@ On Windows, after creating the virtual environment:
 .\scripts\build.ps1
 ```
 
-Current outputs are in `outputs/v0.3.1/SpeakFromHere/`: windowed `SpeakFromHere.exe`, advanced `SpeakFromHereConsole.exe`, `reader-worker/`, `SpeakFromHere-Windows-x64.zip` and `SHA256SUMS.txt`. Published v0.3.0 files are not overwritten. No separate Python installation is needed. The ZIP includes both entries, the complete capture-helper runtime and canonical guides from `docs/`. Both entries launch the same lightweight helper without a terminal or another player, avoiding repeated unpacking/loading of the full reader. Extract and keep the whole folder together. Intermediate files stay in `work/`.
+Current outputs are in `outputs/v0.4.0/SpeakFromHere/`: windowed `SpeakFromHere.exe`, advanced `SpeakFromHereConsole.exe`, `reader-worker/`, `SpeakFromHere-Windows-x64.zip` and `SHA256SUMS.txt`. Published v0.3.0 files are not overwritten. No separate Python installation is needed. The ZIP includes both entries, the complete capture-helper runtime and canonical guides from `docs/`. Both entries launch the same lightweight helper without a terminal or another player, avoiding repeated unpacking/loading of the full reader. Extract and keep the whole folder together. Intermediate files stay in `work/`.
 
 The build uses [PyInstaller](https://pyinstaller.org/en/stable/usage.html): single-file main entries, a one-directory capture helper.
 
@@ -196,7 +204,17 @@ Settings commands save/show and exit without starting speech, capture or hotkeys
 
 Only `pause`, `stop` and `exit` bindings can change, using `Alt+LETTER` or `Alt+Shift+LETTER` (A-Z). Repeat `--set-hotkey` to update multiple controls together. Duplicate/unsupported keys and conflicts with fixed `Alt+S` / `Alt+E` are rejected before saving. No live rebinding. Startup displays the effective controls: use those instead of the default keys in the checks above. Another app may occupy a valid binding; startup names that conflict, releases acquired keys and exits rather than silently disabling a control.
 
-Source and portable versions share `%LOCALAPPDATA%\AIChatReader\settings.json`. Schema 2 adds `language` to rate and control bindings; no chat text or credentials are saved. Existing schema-1 files load unchanged and upgrade only on explicit save. **Back up settings before switching versions:** v0.2.1 does not understand schema 2 and falls back to defaults with a warning. Saves are atomic. Missing files use defaults without creating a file. Invalid/unreadable files are preserved with warning/default startup; direct updates are refused. After backing up, explicitly confirm GUI Reset or use `--reset-settings` to replace them. `--settings-file PATH` selects an isolated profile, without changing paragraph scope.
+Source and portable versions share `%LOCALAPPDATA%\AIChatReader\settings.json`. v0.4.0 saves **schema 3**, adding `voice_id` (empty = default) to rate, keys and UI language; no chats/credentials. Schema 1/2 load without rewriting and use default voice; upgrade only on explicit save. **Back up before testing/downgrading:** v0.3.1 and earlier do not understand schema 3 and warn/use defaults; do not reset the backup accidentally. Saves are atomic. Missing files use defaults without writing. Invalid/unreadable files are preserved with warning/default startup and refused direct updates. After backup, explicitly confirm GUI Reset or use `--reset-settings` to replace them. `--settings-file PATH` selects an isolated profile, not broader paragraph support.
+
+Advanced local voice commands (no speech or hotkey registration):
+
+```powershell
+.\.venv\Scripts\python.exe -m chat_reader.app --list-voices
+.\.venv\Scripts\python.exe -m chat_reader.app --set-voice 'TOKEN_ID_FROM_LIST'
+.\.venv\Scripts\python.exe -m chat_reader.app --set-voice default
+```
+
+Use the exact installed token ID from the list, not its display name. CLI saving takes effect when the reader restarts; rate/key-only commands preserve your voice choice. `--show-settings` does not create a speech object.
 
 To check customized settings: save rate 2 and pause `Alt+J`, restart, verify startup feedback and audible rate, use the new pause/resume key, repeat selection and first/middle/last paragraph reads, then stop/exit and restart. Unsupported content must still report “Use Alt + S” without copying/speaking automatically. Restore defaults with `--reset-settings` if desired.
 

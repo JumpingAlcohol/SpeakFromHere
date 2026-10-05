@@ -35,7 +35,7 @@ class SettingsTests(unittest.TestCase):
         self.assertEqual(3, loaded.rate)
         self.assertEqual("Alt + Shift + J", loaded.hotkeys["pause"])
         document = json.loads(self.path.read_text(encoding="utf-8"))
-        self.assertEqual({"schema_version": 2, "rate": 3, "language": "en",
+        self.assertEqual({"schema_version": 3, "rate": 3, "language": "en", "voice_id": "",
                           "hotkeys": {"pause": "Alt + Shift + J", "stop": "Alt + K", "exit": "Alt + Q"}}, document)
 
     def test_bad_rates_are_rejected_before_any_file_is_written(self):

@@ -63,7 +63,7 @@ def run_reader_loop(desktop, speaker, *, report=print, paragraph_reader=None,
             event = desktop.next_hotkey()
             if event == "quit":
                 break
-            if event in {"read", "pause", "play", "stop", "paragraph"}:
+            if event in {"read", "pause", "play", "stop", "paragraph", "preview"}:
                 try:
                     if paragraph_reader is not None:
                         paragraph_reader.cancel()
@@ -73,6 +73,10 @@ def run_reader_loop(desktop, speaker, *, report=print, paragraph_reader=None,
                         else:
                             paragraph_reader.start(desktop.pointer_position())
                             report("Checking paragraph... Playback controls remain available.")
+                    elif event == "preview":
+                        speaker.preview_voice()
+                        report("Voice preview: local synthetic sample; previous reply retained for replay.")
+                        continue
                     elif event in {"pause", "play"}:
                         state = speaker.play_pause() if event == "play" else speaker.toggle_pause()
                         report({

@@ -11,6 +11,7 @@ from chat_reader.app import WindowsDesktop, WindowsSpeaker
 from chat_reader.player import PlayerPreferences
 from chat_reader.settings import Settings, load_settings
 from test_app import RecordingEngine
+from voice_fixtures import VoiceEngine
 
 if importlib.util.find_spec("chat_reader.gui"):
     from chat_reader import gui
@@ -25,7 +26,7 @@ class GuiWindowTests(unittest.TestCase):
         self.folder = tempfile.TemporaryDirectory()
         self.addCleanup(self.folder.cleanup)
         self.path = Path(self.folder.name) / "settings.json"
-        self.speaker = WindowsSpeaker(RecordingEngine())
+        self.speaker = WindowsSpeaker(VoiceEngine())
         self.preferences = PlayerPreferences(self.path, Settings(), self.speaker)
         self.window = gui.PlayerWindow(self.preferences, enable_paragraphs=True)
         self.desktop = gui.GuiDesktop(self.window, WindowsDesktop(enable_paragraphs=True, hwnd=self.window.hwnd))
@@ -88,6 +89,44 @@ class GuiWindowTests(unittest.TestCase):
         dialog.save()
         self.assertEqual("Alt + J", load_settings(self.path).hotkeys["pause"])
         self.assertEqual("Alt + P", self.desktop.desktop.settings.hotkeys["pause"])
+
+    def test_voice_selector_uses_ids_even_when_names_match_and_saves_without_audio(self):
+        dialog = self.window.open_settings()
+        self.assertTrue(hasattr(dialog, 'voice_combo'), 'No local voice selector')
+        self.assertEqual('readonly', str(dialog.voice_combo.cget('state')))
+        dialog.voice_combo.current(2)
+        dialog.save()
+        self.assertEqual('token-B', load_settings(self.path).voice_id)
+        self.assertEqual('token-B', self.speaker.engine.Voice.Id)
+        self.assertEqual([], self.speaker.engine.actions)
+
+    def test_save_and_preview_queues_sample_without_losing_previous_reply_or_omissions(self):
+        dialog = self.window.open_settings()
+        self.assertTrue(hasattr(dialog, 'preview_button'), 'No explicit save-and-preview button')
+        self.speaker.last_text = 'Previous reply.'
+        self.window.report('Skipped content: [{"kind":"table","ordinal":2,"before_start":false}]')
+        dialog.voice_combo.current(2)
+        dialog.preview_button.invoke()
+        self.assertEqual('preview', self.desktop.next_hotkey())
+        self.assertEqual('token-B', load_settings(self.path).voice_id)
+        self.assertEqual([], self.speaker.engine.actions, 'Preview must go through the cancel-aware loop')
+        self.window.report('Voice preview: synthetic sample.')
+        self.assertEqual('', self.window.skip_notice.cget('text'))
+        self.window.report('Replaying last text.')
+        self.assertIn('Table', self.window.skip_notice.cget('text'))
+        self.assertEqual('Previous reply.', self.speaker.last_text)
+
+    def test_busy_voice_save_shows_error_and_cannot_overwrite_settings(self):
+        dialog = self.window.open_settings()
+        self.assertTrue(hasattr(dialog, 'voice_combo'), 'No voice selector')
+        self.speaker.speak('Current reply.')
+        self.speaker.toggle_pause()
+        dialog.voice_combo.current(2)
+        dialog.save()
+        self.assertIn('Stop', dialog.error_label.cget('text'))
+        self.assertFalse(self.path.exists())
+        self.assertTrue(self.speaker.paused)
+        self.assertEqual('token-A', self.speaker.engine.Voice.Id)
 
     def test_status_tracks_speech_after_pre_speech_preview_and_after_completion(self):
         # core emits its preview before invoking SAPI; that must not leave the

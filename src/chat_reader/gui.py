@@ -3,7 +3,7 @@ from collections import deque
 import ctypes
 import json
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 import win32api
 import win32con
 import win32gui
@@ -246,6 +246,9 @@ class PlayerWindow:
             if self.details_dialog:
                 self.details_dialog.close()
             self.status_key, self.detail = "checking", ""
+        elif message.startswith("Voice preview:"):
+            self.skipped = ()  # Preview is not a new captured reply.
+            self.status_key, self.detail = "playing", message
         elif message.startswith("Could not") or "No new text copied" in message or "not enabled" in message:
             self.status_key, self.detail = "error", message
         elif message.startswith("Settings warning:"):
@@ -357,22 +360,66 @@ class SettingsDialog:
         self.root.title(text["settings"])
         self.root.protocol("WM_DELETE_WINDOW", self.close)
         self.variables = {}
+        self.voice_ids = [""]
+        labels = [text["default_voice"]]
+        catalog_error = ""
+        try:
+            options = window.speaker.voice_options()
+            for index, item in enumerate(options, 1):
+                self.voice_ids.append(item.id)
+                labels.append(f"{index}. {item.name} ({item.language or '?'})")
+        except Exception as error:
+            catalog_error = str(error)
+        self.available_voice_ids = set(self.voice_ids)
+        saved = window.preferences.value.voice_id
+        current = next((i for i, token_id in enumerate(self.voice_ids)
+                        if token_id.casefold() == saved.casefold()), None)
+        if current is None:
+            current = len(self.voice_ids)
+            self.voice_ids.append(saved)
+            labels.append(text["voice_unavailable"])
+        tk.Label(self.root, text=text["voice"], bg=BG, fg=FG, font=("Segoe UI", 10)).grid(row=0, column=0, sticky="w")
+        self.voice_combo = ttk.Combobox(self.root, values=labels, state="readonly", width=48)
+        self.voice_combo.grid(row=0, column=1, padx=(18, 0), pady=6)
+        self.voice_combo.current(current)
+        self.preview_button = window._button(self.root, text["voice_preview"], self.preview)
+        self.preview_button.grid(row=1, column=1, sticky="e", pady=6)
+        hint = text["voice_hint"]
+        if window.speaker.voice_warning:
+            hint += "\n" + text["voice_fallback"]
+        tk.Label(self.root, text=hint, bg=BG, fg=MUTED, justify="left", wraplength=510,
+                 font=("Segoe UI", 9)).grid(row=2, column=0, columnspan=2, sticky="w", pady=(6, 12))
         for row, action in enumerate(("pause", "stop", "exit")):
-            tk.Label(self.root, text=text[action], bg=BG, fg=FG, font=("Segoe UI", 10)).grid(row=row, column=0, sticky="w", pady=6)
+            tk.Label(self.root, text=text[action], bg=BG, fg=FG, font=("Segoe UI", 10)).grid(row=row+3, column=0, sticky="w", pady=6)
             variable = tk.StringVar(value=window.preferences.value.hotkeys[action])
             self.variables[action] = variable
             tk.Entry(self.root, textvariable=variable, bg=PANEL, fg=FG, insertbackground=FG,
-                     relief="flat", font=("Segoe UI", 11), width=23).grid(row=row, column=1, padx=(18, 0), pady=6)
+                     relief="flat", font=("Segoe UI", 11), width=23).grid(row=row+3, column=1, padx=(18, 0), pady=6)
         tk.Label(self.root, text=text["restart"] + "\nAlt + S / Alt + E: fixed", bg=BG,
-                 fg=MUTED, justify="left", font=("Segoe UI", 9)).grid(row=3, column=0, columnspan=2, pady=12)
+                 fg=MUTED, justify="left", font=("Segoe UI", 9)).grid(row=6, column=0, columnspan=2, pady=12)
         self.error_label = tk.Label(self.root, bg=BG, fg="#ffbc7c", wraplength=330, justify="left")
-        self.error_label.grid(row=4, column=0, columnspan=2)
-        window._button(self.root, text["reset"], self.reset).grid(row=5, column=0, pady=(12, 0), sticky="w")
-        window._button(self.root, text["save"], self.save, accent=True).grid(row=5, column=1, pady=(12, 0), sticky="e")
+        self.error_label.grid(row=7, column=0, columnspan=2)
+        self.error_label.configure(text=catalog_error)
+        window._button(self.root, text["reset"], self.reset).grid(row=8, column=0, pady=(12, 0), sticky="w")
+        window._button(self.root, text["save"], self.save, accent=True).grid(row=8, column=1, pady=(12, 0), sticky="e")
+
+    def preview(self):
+        try:
+            if self.window.speaker.playback_state() != "idle":
+                raise ValueError("Stop the current speech before changing or previewing a voice.")
+            voice_id = self.voice_ids[self.voice_combo.current()]
+            if voice_id not in self.available_voice_ids:
+                raise ValueError("The saved local voice is unavailable. Choose an installed voice or the default.")
+            self.window.preferences.update(voice_id=voice_id)
+            self.window.commands.append("preview")
+            self.error_label.configure(text="")
+        except Exception as error:
+            self.error_label.configure(text=str(error))
 
     def save(self):
         try:
-            self.window.preferences.update(hotkeys={action: value.get() for action, value in self.variables.items()})
+            self.window.preferences.update(voice_id=self.voice_ids[self.voice_combo.current()],
+                hotkeys={action: value.get() for action, value in self.variables.items()})
             self.window.status_key, self.window.detail = "ready", TEXT[self.window.preferences.value.language]["restart"]
             self.window.refresh()
             self.close()
@@ -428,12 +475,14 @@ def run_gui(path, value, *, enable_paragraphs=True, warning=None):
     from chat_reader.paragraph_job import ParagraphCapture
     # Set DPI awareness before creating any Tk widgets, never change another app.
     ctypes.windll.user32.SetProcessDPIAware()
-    speaker = create_windows_speaker(rate=value.rate)
+    speaker = create_windows_speaker(rate=value.rate, voice_id=value.voice_id)
     window = PlayerWindow(PlayerPreferences(path, value, speaker), enable_paragraphs=enable_paragraphs)
     desktop = GuiDesktop(window, WindowsDesktop(settings=value, enable_paragraphs=enable_paragraphs, hwnd=window.hwnd))
     try:
         if warning:
             window.report("Settings warning: " + warning)
+        if speaker.voice_warning:
+            window.report("Settings warning: " + speaker.voice_warning)
         run_reader_loop(desktop, speaker, report=window.report, settings=value,
                         paragraph_reader=ParagraphCapture() if enable_paragraphs else None)
     finally:

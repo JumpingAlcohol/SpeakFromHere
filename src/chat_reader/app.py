@@ -3,6 +3,7 @@
 import argparse
 import ctypes
 import sys
+from comtypes import COMError
 import pyperclip
 import win32api
 import win32con
@@ -24,6 +25,39 @@ class WindowsSpeaker:
         self.audio_control = audio_control
         self._output_paused = False
         self.startup_cue = startup_cue
+        self.voice_id = ""
+        self.voice_warning = ""
+        self._default_voice = None
+
+    def voice_options(self):
+        from chat_reader.voices import voice_options
+        return voice_options(self.engine)
+
+    def set_voice(self, voice_id):
+        Settings(voice_id=voice_id)
+        if self.playback_state() != "idle":
+            raise ValueError("Stop the current speech before changing or previewing a voice.")
+        if self._default_voice is None:
+            self._default_voice = self.engine.Voice
+        token = self._default_voice
+        if voice_id:
+            tokens = self.engine.GetVoices()
+            token = next((tokens.Item(index) for index in range(tokens.Count)
+                          if tokens.Item(index).Id.casefold() == voice_id.casefold()), None)
+            if token is None:
+                raise ValueError("The selected local voice is unavailable. Choose an installed voice or the default.")
+        self.engine.Voice = token
+        self.voice_id = token.Id if voice_id else ""
+        self.voice_warning = ""
+
+    def preview_voice(self):
+        if self.playback_state() != "idle":
+            raise ValueError("Stop the current speech before changing or previewing a voice.")
+        previous_text = self.last_text
+        try:
+            self.speak("一二三四五。这是声源试听。 Hello! This is a voice preview.")
+        finally:
+            self.last_text = previous_text  # Never replace the reply retained for replay.
 
     def _resume(self, *, cancel=False):
         if self._output_paused:
@@ -93,12 +127,19 @@ class WindowsSpeaker:
         return "paused"
 
 
-def create_windows_speaker(*, rate=0):
+def create_windows_speaker(*, rate=0, voice_id=""):
     """Both runtime entries use the same owned voice and output controller."""
     from chat_reader.windows_audio import StartupCue, WaveOutputControl, create_voice
     engine = create_voice()
-    return WindowsSpeaker(engine, rate=rate, audio_control=WaveOutputControl(engine),
-                          startup_cue=StartupCue(engine))
+    speaker = WindowsSpeaker(engine, rate=rate, audio_control=WaveOutputControl(engine),
+                             startup_cue=StartupCue(engine))
+    if voice_id:
+        try:
+            speaker.set_voice(voice_id)
+        except (ValueError, OSError, COMError) as error:
+            speaker.set_voice("")
+            speaker.voice_warning = f"{error} Using the local default voice; saved preferences left unchanged."
+    return speaker
 
 
 class WindowsDesktop:
@@ -178,6 +219,8 @@ def run(argv=None):
     parser.add_argument("--paragraph-worker", nargs=2, type=int, help=argparse.SUPPRESS)
     parser.add_argument("--settings-file", help="Override the local settings path (for isolated profiles/testing)")
     parser.add_argument("--show-settings", action="store_true", help="Show settings without starting the reader")
+    parser.add_argument("--list-voices", action="store_true", help="List local SAPI voice IDs without speaking")
+    parser.add_argument("--set-voice", metavar="ID", help="Save an installed SAPI voice ID, or default; restart to apply")
     parser.add_argument("--set-rate", type=int, metavar="N", help="Save speaking rate -10 to 10; restart reader to apply")
     parser.add_argument("--set-hotkey", action="append", default=[], metavar="ACTION=CHORD",
                         help="Save pause, stop or exit binding, e.g. pause=Alt+J; restart to apply")
@@ -187,10 +230,18 @@ def run(argv=None):
         from chat_reader.paragraph_worker import main
         raise SystemExit(main([str(value) for value in args.paragraph_worker]))
     try:
-        if args.reset_settings and (args.set_rate is not None or args.set_hotkey):
+        if args.reset_settings and (args.set_rate is not None or args.set_hotkey or args.set_voice is not None):
             raise SettingsError("Use --reset-settings separately from other changes.")
+        if args.list_voices:
+            if args.reset_settings or args.set_rate is not None or args.set_hotkey or args.set_voice is not None:
+                raise SettingsError("Use --list-voices separately from settings changes.")
+            speaker = create_windows_speaker()
+            print("default | Local Windows default", flush=True)
+            for item in speaker.voice_options():
+                print(f"{item.id} | {item.name} | {item.language}", flush=True)
+            return
         path = args.settings_file or settings_path()
-        changed = args.set_rate is not None or bool(args.set_hotkey) or args.reset_settings
+        changed = args.set_rate is not None or bool(args.set_hotkey) or args.reset_settings or args.set_voice is not None
         warning = None
         try:
             value = Settings() if args.reset_settings else load_settings(path)
@@ -210,12 +261,18 @@ def run(argv=None):
                     raise SettingsError("Use each action once: pause=CHORD, stop=CHORD or exit=CHORD. Alt + S / Alt + E are fixed.")
                 seen.add(action)
                 hotkeys[action] = chord
+            voice_id = value.voice_id
+            if args.set_voice is not None:
+                voice_id = "" if args.set_voice == "default" else args.set_voice
+                # Validate through the real local catalog before changing disk.
+                create_windows_speaker().set_voice(voice_id)
             value = Settings(rate=value.rate if args.set_rate is None else args.set_rate, hotkeys=hotkeys,
-                             language=value.language)
+                             language=value.language, voice_id=voice_id)
             save_settings(path, value)
             print("Settings saved. Restart the reader to apply changes; running instances are unchanged.", flush=True)
         if changed or args.show_settings:
             print(f"Settings file: {path}\nRate: {value.rate}\nRead selection: Alt + S (fixed)\nParagraph: Alt + E (fixed; only when enabled)", flush=True)
+            print(f"Voice: {value.voice_id or 'default'}", flush=True)
             for action, chord in value.hotkeys.items():
                 print(f"{action}: {chord}", flush=True)
             return
@@ -223,7 +280,9 @@ def run(argv=None):
             from chat_reader.gui import run_gui
             return run_gui(path, value, enable_paragraphs=True, warning=warning)
         print(f"Settings file: {path}", flush=True)
-        speaker = create_windows_speaker(rate=value.rate)
+        speaker = create_windows_speaker(rate=value.rate, voice_id=value.voice_id)
+        if speaker.voice_warning:
+            print("Voice warning: " + speaker.voice_warning, flush=True)
         desktop = WindowsDesktop(enable_paragraphs=args.paragraphs, settings=value)
         paragraph_reader = None
         if args.paragraphs:

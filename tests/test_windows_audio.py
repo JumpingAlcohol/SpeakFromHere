@@ -25,7 +25,7 @@ def load_runtime():
         from PyInstaller.archive.readers import CArchiveReader
         archive = CArchiveReader(os.environ["CHAT_READER_AUDIO_ARCHIVE"])
         embedded = archive.open_embedded_archive("PYZ.pyz")
-        for short in ("windows_audio", "app"):
+        for short in ("settings", "voices", "windows_audio", "app"):
             full = "chat_reader." + short
             code = (embedded.extract(full) if full in embedded.toc
                     else marshal.loads(archive.extract(short)))
@@ -45,9 +45,12 @@ def native_case(case):
 
     def exercise(_desktop, speaker, **_options):
         voice = speaker.engine
+        result["voice_id"] = voice.Voice.Id
         voice.Volume = 0  # This voice only; no system mute or recording.
         output = voice.AudioOutputStream
-        text = "一二三四五。这里是暂停和继续测试。 " * 20
+        # Both language-specific engines need enough speakable content to stay
+        # active throughout rate/pause checks; English SAPI can skip Chinese.
+        text = "一二三四五。这里是暂停和继续测试。 This long passage checks pause and resume. " * 20
         try:
             result["initial_state"] = speaker.toggle_pause()
             speaker.speak(text)
@@ -118,7 +121,12 @@ def native_case(case):
 
     with tempfile.TemporaryDirectory(prefix="reader-audio-test-") as folder, \
             patch.object(app, "run_reader_loop", exercise):
-        app.run(["--settings-file", str(Path(folder) / "settings.json")])
+        path = Path(folder) / "settings.json"
+        selected = os.environ.get("CHAT_READER_TEST_VOICE_ID", "")
+        if selected:
+            from chat_reader.settings import Settings, save_settings
+            save_settings(path, Settings(voice_id=selected))
+        app.run(["--settings-file", str(path)])
     print("AUDIO_RESULT=" + json.dumps(result), flush=True)
 
 

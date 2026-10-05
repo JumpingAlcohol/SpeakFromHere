@@ -1,4 +1,4 @@
-SpeakFromHere v0.3.1 — 音频稳定性预览版
+SpeakFromHere v0.4.0 — 本机声源选择预览版
 English: QuickStart.en.txt | 简体中文: QuickStart.zh-CN.txt
 
 Read AI responses aloud from exactly where you want.
@@ -31,24 +31,34 @@ Alt + Shift + Q：退出（默认）。
 跳过提示：显示省略类型／数量，包括起读段落前的块。
 详细信息列出回复块序号及“起点前／剩余回复中”的位置，不包含被跳过文字或文件名，
 只在内存中保留。这不是原文高亮或同步进度；新读取替换，暂停／重播保留。
-⚙：修改暂停／停止／退出键，重启生效；Alt+S／Alt+E 固定。
+⚙：选择本机声源和修改控制键。先停止朗读再切换声源，声源立即生效；
+控制键仍需重启。Alt+S／Alt+E 固定。
+“保存声源并试听”只保存声源，再朗读固定中英文样句；不覆盖上一条回复／跳过详情，
+使用原有播放控制，可能消耗本次启动的一次首读提示音。只选择／保存不发声。
+仅列出 SAPI 可用的已安装声源，不自动切换语言、下载声音、改注册表或接在线服务。
+单语声源可能跳过其他语言。Windows 默认只作用于本程序；已保存声源缺失／加载
+失败时提示并回退，不改写偏好。可选其他声音或明确重置。
 —：隐藏到托盘，点击通知区域图标恢复。
 ×：退出并释放快捷键。本预览版没有开机启动选项。
 
 设置与隐私
-%LOCALAPPDATA%\AIChatReader\settings.json（schema 2）只保存语速、控制键和
-GUI 语言，不保存聊天／凭据。重播文字只在内存中，退出后清空。
+%LOCALAPPDATA%\AIChatReader\settings.json（schema 3）只保存语速、控制键、
+GUI 语言和本机声源 ID，不保存聊天／凭据。重播文字只在内存中，退出后清空。
 预览最多 100 字符（面板可能显示更少），朗读使用完整文本。
 选文复制会替换剪贴板，目标须支持 Ctrl+C；管理员权限应用可能受 Windows 限制。
 控制键：Alt+字母 或 Alt+Shift+字母（A-Z），拒绝重复／保留键。
 外部快捷键冲突会在启动时指出，并释放已取得的键。
-旧 schema 1 直接读取不修改，主动保存才升级 schema 2。
-降级前备份：v0.2.1 不认识 schema 2，会警告并使用默认值。
+旧 schema 1／2 直接读取不修改，使用默认声源，主动保存才升级 schema 3。
+测试／降级前务必备份：v0.3.1 及更早版本不认识 schema 3，会警告并使用默认值。
+不要误重置备份。
 没有文件时使用默认值；无效文件保留并警告／使用默认值，拒绝直接更新。
 备份后可明确确认“重置设置”替换原配置。
 
 高级终端入口（可选，不要与 GUI 同时运行）
   .\SpeakFromHereConsole.exe --show-settings
+  .\SpeakFromHereConsole.exe --list-voices
+  .\SpeakFromHereConsole.exe --set-voice 'TOKEN_ID_FROM_LIST'
+  .\SpeakFromHereConsole.exe --set-voice default
   .\SpeakFromHereConsole.exe --set-rate 2 --set-hotkey 'pause=Alt+J'
   .\SpeakFromHereConsole.exe
 终端设置重启生效；Ctrl+C 仅用于终端模式退出。
@@ -57,6 +67,8 @@ GUI 语言，不保存聊天／凭据。重播文字只在内存中，退出后�
 
 边界和检查
 使用本地 Windows SAPI，本轮不增加自然声源／新语音后端。
+v0.4.0 仅增加本机声源选择，其他后端暂缓。用户确认所测英文朗读及重启
+记忆正常；不代表所有声源／语言均兼容。历史 Release 不改。
 暂时起读方案：每次启动后仅首次非空朗读前，通过同一声源／输出加 400 毫秒柔和有声
 提示音。只打开程序不发声；继续、重播、后续朗读不重复。空选文／读取失败保留首读
 提示音，语音提交失败取消排队音频。本轮没有提示音设置开关。

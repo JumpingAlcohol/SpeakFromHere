@@ -30,11 +30,19 @@ v0.2.0 新增针对已检查桌面应用版本的段落到回复末尾朗读，�
 
 **v0.3.0 — 悬浮播放器与有边界跳过预览版**新增无需终端的播放器、持久保存的双语设置，以及已识别不可读块的省略提示。播放延迟／开头吞字仍待处理。`Alt + S` 和 `Alt + E` 保持固定，不开放其他应用的段落读取。
 
-[下载 v0.3.1 预览版](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.3.1) · [旧版 v0.3.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.3.0) · [旧版 v0.2.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.2.0) · [旧版 v0.1.0](https://github.com/JumpingAlcohol/ai-chat-reader/releases/tag/v0.1.0) · [版本计划](docs/ROADMAP.zh-CN.md)
+[下载 v0.4.0 预览版](https://github.com/JumpingAlcohol/SpeakFromHere/releases/tag/v0.4.0) · [旧版 v0.3.1](https://github.com/JumpingAlcohol/SpeakFromHere/releases/tag/v0.3.1) · [旧版 v0.3.0](https://github.com/JumpingAlcohol/SpeakFromHere/releases/tag/v0.3.0) · [旧版 v0.2.0](https://github.com/JumpingAlcohol/SpeakFromHere/releases/tag/v0.2.0) · [旧版 v0.1.0](https://github.com/JumpingAlcohol/SpeakFromHere/releases/tag/v0.1.0) · [版本计划](docs/ROADMAP.zh-CN.md)
 
 **v0.3.1 — 音频稳定性预览版**：GUI 和终端入口暂停各自 SAPI 声源拥有的波形输出，保留继续播放的位置。取消暂停中的朗读时，先清除该声源已排队的音频，再由 SAPI 替换／停止文本。真实设备静音回归检查暂停后暂定 200 毫秒预算内播放位置保持不变，并覆盖恢复、变速、替换、停止／重播及退出；不承诺零延迟或所有设备兼容。经用户同意，每次启动后仅在首次非空朗读前，通过同一声源／输出加一次 **400 毫秒柔和有声提示音**，作为开头吞字的暂时方案。仅打开程序不发声；继续、重播及后续朗读不重复提示音。空选文／读取失败不消耗首读提示音，语音提交失败会取消已排队音频；提示音遵循本声源音量。用户确认新版所测流程正常，不代表所有设备兼容，不处理后续长时间闲置再起读的潜在吞字。非波形／尚未打开的输出保留 SAPI 暂停路径。不改变系统音量或默认音频设备。[发布说明](docs/releases/v0.3.1.md)。
 
-原名 **AI Chat Reader**。保留仓库地址、Python 分发名 `ai-chat-reader`、模块 `chat_reader`、测试环境变量及 `%LOCALAPPDATA%\AIChatReader\settings.json`。历史下载名称与文件不改。当前构建到 `outputs/v0.3.1/SpeakFromHere/`，已发布 v0.3.0 产物单独保留，没有重命名远端仓库。
+原名 **AI Chat Reader**。仓库所有者已将 GitHub 仓库改名为 **SpeakFromHere**；Python 分发名 `ai-chat-reader`、模块 `chat_reader`、测试环境变量及 `%LOCALAPPDATA%\AIChatReader\settings.json` 保持兼容。历史下载名称与文件不改。当前构建到 `outputs/v0.4.0/SpeakFromHere/`，所有已发布产物单独保留。
+
+## 本机声源选择（v0.4.0 预览版）
+
+打开 **⚙ 设置**，停止当前朗读，选择**本机声源**并**保存**。**保存声源并试听**只保存声源选择，再排队朗读固定中英文样句；不抓取文字、不覆盖上一条回复的重播内容。试听使用原有控制，并可能消耗本次启动的一次首读提示音。单独选择／保存不发声。停止时切换声源对当前程序立即生效，控制键修改仍需重启。
+
+列表仅包含本机 Windows SAPI 向当前进程提供的声源及语言信息，按 token ID 保存，不按列表序号／显示名称。**Windows 默认**使用本次程序取得的默认声源，不修改 Windows 设置。已保存声源卸载或加载失败时，启动提示并使用本机默认，不改写偏好；可选其他声源或明确重置。正在播放／暂停时拒绝切换，避免丢失位置；保存失败恢复先前运行时声源／语速。
+
+不自动切换语言、安装声音、复制 OneCore 注册表或接在线服务，也不保证自然人声；单语声源可能跳过其他语言。SAPI 枚举／选择依据 [Microsoft GetVoices／Voice 文档](https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee125639(v=vs.85))。用户确认所测候选版英文朗读和重启后记忆正常。本版本仅发布本机选择，其他可选后端暂缓；不代表所有声源或混合语言均兼容。[发布说明](docs/releases/v0.4.0.md)。
 
 ## 悬浮播放器（v0.3.0 预览版）
 
@@ -78,7 +86,7 @@ v0.2.0 新增针对已检查桌面应用版本的段落到回复末尾朗读，�
 
 双击新的 `SpeakFromHere.exe` 启动悬浮界面，已包含 Python、Tk 和依赖。`SpeakFromHereConsole.exe` 是高级终端入口，用于诊断及设置命令；不要同时运行两者。
 
-两个当前便携入口均默认启用 `Alt + E`。构建位于 `outputs/v0.3.1/SpeakFromHere/`，旧文件分开保留。v0.1.0 下载仍只支持选文朗读。
+两个当前便携入口均默认启用 `Alt + E`。构建位于 `outputs/v0.4.0/SpeakFromHere/`，旧文件分开保留。v0.1.0 下载仍只支持选文朗读。
 
 ZIP 包含 `SpeakFromHere.exe`、`SpeakFromHereConsole.exe`、`QuickStart.en.txt` 和 `QuickStart.zh-CN.txt`。请先解压再运行。二进制文件只放在被忽略的 `outputs/`，不提交到 Git。
 
@@ -160,7 +168,7 @@ Remove-Item Env:\CHAT_READER_WINDOWS_TESTS
 .\scripts\build.ps1
 ```
 
-当前输出在 `outputs/v0.3.1/SpeakFromHere/`：无终端的 `SpeakFromHere.exe`、高级 `SpeakFromHereConsole.exe`、`reader-worker/`、`SpeakFromHere-Windows-x64.zip` 和 `SHA256SUMS.txt`。不覆盖已发布 v0.3.0 文件。无需另装 Python。ZIP 包含两个入口、完整读取辅助程序及来自 `docs/` 的两份规范说明。两入口启动同一个轻量读取程序，不打开终端或另一个播放器，避免每次解包／载入完整朗读器。须完整解压并保留目录结构，中间文件位于 `work/`。
+当前输出在 `outputs/v0.4.0/SpeakFromHere/`：无终端的 `SpeakFromHere.exe`、高级 `SpeakFromHereConsole.exe`、`reader-worker/`、`SpeakFromHere-Windows-x64.zip` 和 `SHA256SUMS.txt`。不覆盖已发布 v0.3.0 文件。无需另装 Python。ZIP 包含两个入口、完整读取辅助程序及来自 `docs/` 的两份规范说明。两入口启动同一个轻量读取程序，不打开终端或另一个播放器，避免每次解包／载入完整朗读器。须完整解压并保留目录结构，中间文件位于 `work/`。
 
 构建采用 [PyInstaller](https://pyinstaller.org/en/stable/usage.html)：主入口为单文件，读取辅助程序为单目录。
 
@@ -198,7 +206,17 @@ GUI 可调整语速／语言并打开设置窗口；高级使用仍可用命令�
 
 只允许修改 `pause`、`stop`、`exit`，格式为 `Alt+字母` 或 `Alt+Shift+字母`（A-Z）。重复 `--set-hotkey` 可一起修改多个控制。重复／不支持的键、与固定 `Alt+S`／`Alt+E` 的冲突会在保存前被拒绝。不做运行中重新绑定。启动显示实际控制键，测试时使用它们代替前文默认值。其他应用仍可能占用格式有效的键：启动明确指出冲突，释放已取得的键并退出，不会悄悄禁用控制。
 
-源码和便携版共用 `%LOCALAPPDATA%\AIChatReader\settings.json`。schema 2 在语速／控制绑定之外新增 `language`，不保存聊天或凭据。schema 1 可直接读取，只有主动保存才升级。**切换版本前请备份设置：**v0.2.1 不认识 schema 2，会警告并退回默认值。保存采用原子替换。文件不存在时使用默认值，不自动创建；无效／不可读文件保留并警告／使用默认值，拒绝直接更新。备份后可明确确认 GUI 重置或用 `--reset-settings` 替换。`--settings-file PATH` 可指定隔离配置，不改变段落支持范围。
+源码和便携版共用 `%LOCALAPPDATA%\AIChatReader\settings.json`。v0.4.0 保存 **schema 3**，在语速／控制键／语言外新增 `voice_id`（空值为默认），不保存聊天／凭据。schema 1／2 直接读取不改写，使用默认声源，主动保存才升级。**测试／降级前备份：**v0.3.1 及更早版本不认识 schema 3，会警告并使用默认值，勿误重置备份。原子保存；文件缺失时不创建，无效／不可读文件保留并警告／使用默认值，拒绝直接更新。备份后可明确确认 GUI 重置或用 `--reset-settings` 替换；`--settings-file PATH` 可指定隔离配置，不扩大段落支持。
+
+高级本机声源命令（不发声、不注册快捷键）：
+
+```powershell
+.\.venv\Scripts\python.exe -m chat_reader.app --list-voices
+.\.venv\Scripts\python.exe -m chat_reader.app --set-voice 'TOKEN_ID_FROM_LIST'
+.\.venv\Scripts\python.exe -m chat_reader.app --set-voice default
+```
+
+使用列表中的已安装精确 token ID，不是显示名称。CLI 保存后重启生效；仅修改语速／控制键的命令保留声源选择。`--show-settings` 不创建语音对象。
 
 检查自定义设置：保存语速 2 和暂停键 `Alt+J`，重启，核对启动显示与听感，用新键暂停／继续，重复选文及首段／中段／末段朗读，然后停止、退出并重新启动。不支持的内容仍须提示 “Use Alt + S”，不能自动复制／发声。需要时可用 `--reset-settings` 恢复默认值。
 

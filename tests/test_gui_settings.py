@@ -18,7 +18,7 @@ class GuiSettingsTests(unittest.TestCase):
             self.assertEqual(content, path.read_text(encoding="utf-8"))
             save_settings(path, value)
             data = json.loads(path.read_text(encoding="utf-8"))
-            self.assertEqual(2, data["schema_version"])
+            self.assertEqual(3, data["schema_version"])
             self.assertEqual(-2, data["rate"])
             self.assertEqual("Alt + J", data["hotkeys"]["pause"])
 

@@ -5,7 +5,7 @@
 - Public product name: `SpeakFromHere` (exact capitalization). Tagline: `Read AI responses aloud from exactly where you want.` Chinese supporting line: `AI 回复，从你想听的位置开始。`
 - Lead with reply-aware, paragraph-start listening in an inspected Windows Codex desktop build, not generic TTS. Always clarify paragraph granularity; no arbitrary-character/sentence-seeking or universal compatibility claim.
 - Read `docs/BRAND.md` and `docs/COMPETITIVE_POSITIONING.md` for copy. Do not claim first/only/best or name/trademark clearance. Open latency/audio-loss and unsupported-block issues remain open; no safe-skipping or natural-voice claims before verification.
-- Keep legacy repository URL, Python distribution/module, environment variables and local settings path compatible unless a separate migration is requested. Preserve historical release files/notes. New local bundles use `SpeakFromHere` filenames.
+- The owner renamed the GitHub repository to `JumpingAlcohol/SpeakFromHere` on 2026-10-04; current links/origin use that verified URL. Keep legacy Python distribution/module, environment variables and local settings path compatible unless a separate migration is requested. Preserve historical release files/notes. New local bundles use `SpeakFromHere` filenames.
 
 ## Language policy
 
